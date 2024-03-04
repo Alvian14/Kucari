@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project_kucari/src/navbar_screen.dart';
 import 'package:project_kucari/page/daftar_screen.dart';
 import 'package:project_kucari/page/lupa_kata_sandi/lupa_kataSandi.dart';
 import 'package:project_kucari/src/style.dart';
@@ -125,11 +126,16 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 SizedBox(height: 30.0),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => NavbarScreen()),
+                    );
+                  },
                   style: ElevatedButton.styleFrom(
                     padding: EdgeInsets.symmetric(horizontal: 143.0, vertical: 12.0), // Sesuaikan dengan kebutuhan
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0), // Tidak ada radius
+                      borderRadius: BorderRadius.circular(8.0),
                     ),
                     backgroundColor: AppColors.hijau,
                   ),
@@ -193,21 +199,21 @@ class _LoginScreenState extends State<LoginScreen> {
                           onTap: (){
                             Navigator.push(context, MaterialPageRoute(builder: (context) => HalamanDaftar()));
                           },
-                        child: RichText(
-                          text: TextSpan(
-                            style: TextStyles.title,
-                            children: [
-                              TextSpan(
-                                text: 'Belum punya akun? ',
-                              ),
-                              TextSpan(
-                                text: 'Daftar',
-                                style: TextStyle(color: Colors.blue),
-                              ),
-                            ],
+                          child: RichText(
+                            text: TextSpan(
+                              style: TextStyles.title,
+                              children: [
+                                TextSpan(
+                                  text: 'Belum punya akun? ',
+                                ),
+                                TextSpan(
+                                  text: 'Daftar',
+                                  style: TextStyle(color: Colors.blue),
+                                ),
+                              ],
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                          textAlign: TextAlign.center,
-                        ),
                       ),
                     ),
                     ),

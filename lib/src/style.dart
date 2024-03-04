@@ -8,6 +8,7 @@ class AppColors {
   static const gray700 = Color(0xFF6B7280);
   static const gray300 = Color(0xFFF9FAFB);
   static const gray200 = Color(0xFFD1D5DB);
+  static const gray100 = Color(0xFF9CA3AF);
   static const putih = Color(0xFFFFFFFF);
   static const hitam = Color(0xFF28293D);
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project_kucari/src/navbar_screen.dart';
 // import 'package:project_kucari/page/login_screen.dart';
 import 'package:project_kucari/page/splash_screen.dart'; // Adjust the package name accordingly
 void main() {
@@ -11,7 +12,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: SplashScreen(),
-      // home: LoginScreen(),
+      // home: NavbarScreen(),
+      
     );
   }
 }
