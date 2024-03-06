@@ -129,7 +129,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   onPressed: () {
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => NavbarScreen()),
+                      MaterialPageRoute(builder: (context) => NavbarScreen(onTabPressed: (p0) {
+                        
+                      },)),
                     );
                   },
                   style: ElevatedButton.styleFrom(

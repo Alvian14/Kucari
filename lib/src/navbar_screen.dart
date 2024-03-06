@@ -7,12 +7,27 @@ import 'package:project_kucari/page/beranda/upload_screen.dart';
 import 'package:project_kucari/src/style.dart'; 
 
 class NavbarScreen extends StatefulWidget {
+  int selectedIndex;
+  final Function(int) onTabPressed; // Tambahkan baris ini
+
+  NavbarScreen({Key? key, required this.onTabPressed, this.selectedIndex = 0}) : super(key: key); // Tambahkan baris ini
+
   @override
   _NavbarScreenState createState() => _NavbarScreenState();
 }
 
 class _NavbarScreenState extends State<NavbarScreen> {
-  int _selectedIndex = 0;
+
+
+  void _onItemTapped(int index) {
+  setState(() {
+    widget.selectedIndex = index;
+  });
+
+  widget.onTabPressed(index); // Tambahkan baris ini
+}
+
+  // static int _selectedIndex = 0;
   // static const TextStyle optionStyle =
   //     TextStyle(fontSize: 30, fontWeight: FontWeight.w500, fontFamily: 'Inter');
   static const List<Widget> _widgetOptions = <Widget>[
@@ -23,10 +38,14 @@ class _NavbarScreenState extends State<NavbarScreen> {
     ProfilScreen(),
   ];
 
-  void _onItemTapped(int index) {
+  void onTabPressed(int index) {
     setState(() {
-      _selectedIndex = index;
+      widget.selectedIndex = index;
     });
+  }
+
+  static void update(){
+      // widget.selectedIndex = 2;
   }
 
   @override
@@ -34,7 +53,7 @@ class _NavbarScreenState extends State<NavbarScreen> {
     return Scaffold(
       body: SafeArea(
         child: Center(
-          child: _widgetOptions.elementAt(_selectedIndex),
+          child: _widgetOptions.elementAt(widget.selectedIndex),
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -61,7 +80,7 @@ class _NavbarScreenState extends State<NavbarScreen> {
             label: 'Profil',
           ),
         ],
-        currentIndex: _selectedIndex,
+        currentIndex: widget.selectedIndex,
         selectedItemColor: AppColors.hijau,
         unselectedItemColor: AppColors.gray100,
         iconSize: 25,
