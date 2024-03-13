@@ -14,7 +14,8 @@ class _LupaKataSandi extends State<LupaKataSandi> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-      // backgroundColor: AppColors.putih,
+        surfaceTintColor: AppColors.putih,
+        shadowColor: AppColors.hitam,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {

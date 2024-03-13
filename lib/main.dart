@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:project_kucari/page/beranda/home_screen.dart';
+import 'package:project_kucari/page/beranda/profil_screen.dart';
+import 'package:project_kucari/page/lupa_kata_sandi/lupaSandi_konfirmasi.dart';
 import 'package:project_kucari/src/navbar_screen.dart';
 // import 'package:project_kucari/page/login_screen.dart';
 import 'package:project_kucari/page/splash_screen.dart'; // Adjust the package name accordingly
@@ -12,8 +15,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: SplashScreen(),
-      // home: NavbarScreen(),
-      
     );
   }
 }

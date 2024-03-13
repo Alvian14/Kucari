@@ -22,10 +22,10 @@ class _homeSreenState extends State<homeSreen> {
           toolbarHeight: 80,
           surfaceTintColor: AppColors.putih,
           backgroundColor: AppColors
-              .putih, // Sesuaikan dengan warna latar belakang yang diinginkan
+              .putih, 
           elevation: 0,
           shadowColor: AppColors
-              .hitam, // Ubah sesuai dengan kebutuhan (misalnya, 0 untuk menghilangkan bayangan)
+              .hitam, 
           title: Padding(
             padding: const EdgeInsets.only(top: 20, bottom: 10),
             child: Row(
@@ -63,7 +63,13 @@ class _homeSreenState extends State<homeSreen> {
                     color: AppColors.hitam,
                   ),
                   onPressed: () {
-                    // Tambahkan fungsi yang ingin dijalankan ketika tombol ditekan
+                    Navigator.pushReplacement(
+                      context,
+                        MaterialPageRoute(builder: (context) => NavbarScreen(
+                          selectedIndex: 2,onTabPressed: (p0) {
+                        },),
+                        ),
+                    );
                   },
                 ),
               ],
@@ -192,14 +198,16 @@ class _homeSreenState extends State<homeSreen> {
                                 children: [
                                   Row(
                                     children: [
-                                      CircleAvatar(),
+                                      CircleAvatar(
+                                        backgroundColor: AppColors.hijau,
+                                      ),
                                       SizedBox(width: 10),
                                       Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            'Agus Fernando',
+                                            'Tiyaaa',
                                             style: TextStyles.bodybold,
                                           ),
                                           Row(

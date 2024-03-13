@@ -33,7 +33,7 @@ class _NavbarScreenState extends State<NavbarScreen> {
   static const List<Widget> _widgetOptions = <Widget>[
     homeSreen(), 
     UploadScreen(), 
-    RiwayatScreen(),
+    // RiwayatScreen(),
     NotifScreen(),
     ProfilScreen(),
   ];
@@ -67,10 +67,10 @@ class _NavbarScreenState extends State<NavbarScreen> {
             icon: ImageIcon(AssetImage('assets/icon/upload.png')),
             label: 'Upload',
           ),
-          BottomNavigationBarItem(
-            icon: ImageIcon(AssetImage('assets/icon/note.png')),
-            label: 'Riwayat',
-          ),
+          // BottomNavigationBarItem(
+          //   icon: ImageIcon(AssetImage('assets/icon/note.png')),
+          //   label: 'Riwayat',
+          // ),
           BottomNavigationBarItem(
             icon: ImageIcon(AssetImage('assets/icon/bell.png')),
             label: 'Notifikasi',

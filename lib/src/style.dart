@@ -17,11 +17,17 @@ class AppColors {
 class TextStyles {
   static TextStyle title = const TextStyle(
     fontFamily: 'Inter',
-    fontWeight: FontWeight.w500, // Gunakan FontWeight.w500 untuk medium
+    fontWeight: FontWeight.w500, 
     fontSize: 15.0,
     color: AppColors.gray800,
   );
 
+  static TextStyle titlehome = const TextStyle(
+    fontFamily: 'Inter',
+    fontWeight: FontWeight.bold,
+    fontSize: 20.0,
+    color: AppColors.gray800,
+  );
 
   static TextStyle body = const TextStyle(
     fontFamily: 'Inter',
@@ -56,6 +62,13 @@ class TextStyles {
     fontWeight: FontWeight.bold,
     fontSize: 15,
     color: AppColors.hitam,
+  );
+
+  static TextStyle textProfil = const TextStyle(
+    fontFamily: 'Inter',
+    fontWeight: FontWeight.w600,
+    fontSize: 16,
+    color: AppColors.gray800,
   );
 
 

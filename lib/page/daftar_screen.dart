@@ -20,7 +20,7 @@ class _HalamanDaftarState extends State<HalamanDaftar> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white, // Ganti dengan warna yang diinginkan
+        surfaceTintColor: AppColors.putih,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
