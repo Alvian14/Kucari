@@ -305,6 +305,128 @@ class _homeSreenState extends State<homeSreen> {
                         ),
                       ),
                       SizedBox(height: 10),
+                      //continer
+                      Container(
+                        child: Column(
+                          children: [
+                            Container(
+                              height: 1,
+                              color: AppColors.gray100,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(5, 10, 5, 10),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      CircleAvatar(
+                                        backgroundColor: AppColors.hijau,
+                                      ),
+                                      SizedBox(width: 10),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Tiyaaa',
+                                            style: TextStyles.bodybold,
+                                          ),
+                                          Row(
+                                            children: [
+                                              Text(
+                                                '19:30',
+                                              ),
+                                              SizedBox(width: 10),
+                                              Text(
+                                                '22/09/2024',
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                LoginScreen()),
+                                      );
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 10.0,
+                                          vertical:
+                                              1.0), // Sesuaikan dengan kebutuhan
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(30.0),
+                                      ),
+                                      backgroundColor: AppColors.merahPudar,
+                                    ),
+                                    child: Text(
+                                      'Kehilangan',
+                                      style: TextStyles.label,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Align(
+                              alignment: Alignment.topLeft,
+                              child: Text(
+                                'Sebuah kucing berwarna oren yang tidak diketahui namanya',
+                                maxLines: 3,
+                                overflow: TextOverflow.ellipsis,
+                                textAlign: TextAlign.justify,
+                              ),
+                            ),
+                            SizedBox(height: 20),
+                            Container(
+                              height: 200,
+                              width: double.infinity,
+                              child: Image.network(
+                                'https://asset.kompas.com/crops/PjtznDXwZQ4vrjNDVLmpCj-2R4g=/19x5:960x633/1200x800/data/photo/2022/01/05/61d54b808e254.jpg',
+                                fit: BoxFit.fitWidth,
+                              ),
+                            ),
+                            SizedBox(height: 1),
+                            Align(
+                              alignment: Alignment.topLeft,
+                              child: Row(
+                                children: [
+                                  IconButton(
+                                    icon: Image.asset(
+                                      'assets/icon/komentar.png',
+                                      width: 24.0,
+                                      height: 24.0,
+                                      color: AppColors.hitam,
+                                    ),
+                                    onPressed: () {
+                                      // Tambahkan fungsi yang ingin dijalankan ketika tombol ditekan
+                                    },
+                                  ),
+                                  SizedBox(
+                                      width:
+                                          1.0), // Sesuaikan jarak antara ikon dan teks
+                                  Text(
+                                    'Komentar',
+                                    style: TextStyle(
+                                      color: AppColors.hitam,
+                                      fontSize: 16.0,
+                                      // Sesuaikan dengan gaya teks yang diinginkan
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),

@@ -65,7 +65,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     textInputType: TextInputType.emailAddress,
                     textInputAction: TextInputAction.next,
                     prefixIcon: 'assets/img/email.png',
-                    hint: 'email@gmail.com', // Menggunakan textInputAction dengan huruf kecil
+                    hint: '', // Menggunakan textInputAction dengan huruf kecil
                   ),
                 ),
 

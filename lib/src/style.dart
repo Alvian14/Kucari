@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class AppColors {
   static const tomato = Color(0xFFFB1313);
+  static const merahPudar = Color(0xFFFC5555);
   static const hijau = Color(0xFF259E73);
   static const hijauMuda = Color(0xFFD0F0E3);
   static const biruMuda = Color(0xFF49BAD3);
