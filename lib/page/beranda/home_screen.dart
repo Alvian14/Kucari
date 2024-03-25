@@ -282,7 +282,7 @@ class _homeSreenState extends State<homeSreen> {
                                       'assets/icon/komentar.png',
                                       width: 24.0,
                                       height: 24.0,
-                                      color: AppColors.hitam,
+                                      color: AppColors.gray100,
                                     ),
                                     onPressed: () {
                                       Navigator.push(context, MaterialPageRoute(builder: (context) => Komentar()));

@@ -1,7 +1,10 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:project_kucari/src/navbar_screen.dart';
+import 'package:http/http.dart' as http;
 import 'package:project_kucari/page/daftar_screen.dart';
 import 'package:project_kucari/page/lupa_kata_sandi/lupa_kataSandi.dart';
+// import 'package:project_kucari/page/lupa_kata_sandi/lupa_kata_sandi.dart';
+import 'package:project_kucari/src/navbar_screen.dart';
 import 'package:project_kucari/src/style.dart';
 import 'package:project_kucari/widget/custom_textfield.dart';
 
@@ -14,6 +17,47 @@ class _LoginScreenState extends State<LoginScreen> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   bool isObscure = true;
+
+  Future<void> _login() async {
+    final String apiUrl ='http://172.17.202.28/project_kucari/mobile/login.php'; // Ganti dengan alamat API login Anda
+    final response = await http.post(Uri.parse(apiUrl),
+        body: jsonEncode({
+          'email': emailController.text,
+          'password': passwordController.text,
+        }));
+
+    final responseData = jsonDecode(response.body);
+    if (responseData['status'] == 'success') {
+      // Navigasi ke halaman setelah login berhasil
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (context) => NavbarScreen(
+                  onTabPressed: (p0) {},
+                )),
+      );
+    } else {
+      // Tampilkan pesan kesalahan jika login gagal
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Login Gagal'),
+            content: Text(responseData['message']),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,7 +69,6 @@ class _LoginScreenState extends State<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SizedBox(height: 55.0),
-                // SizedBox(height: 4.0),
                 Image.asset(
                   'assets/img/login.png',
                   width: 230.0,
@@ -37,8 +80,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   'MASUK',
                   style: TextStyles.body,
                 ),
-
-                // Email
                 SizedBox(height: 5.0),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -50,26 +91,21 @@ class _LoginScreenState extends State<LoginScreen> {
                         style: TextStyles.title,
                       ),
                     ),
-                    // Tambahkan widget lainnya di sini jika diperlukan
                   ],
                 ),
-
-                // TextField Email
                 SizedBox(height: 3.0),
                 Container(
                   constraints: BoxConstraints(
                     maxWidth: 340.0,
                   ),
-                   child: CustomTextField( // Mengganti CustomTextField menjadi CostumTextField
-                    controller: emailController, // Menggunakan emailController
+                  child: CustomTextField(
+                    controller: emailController,
                     textInputType: TextInputType.emailAddress,
                     textInputAction: TextInputAction.next,
                     prefixIcon: 'assets/img/email.png',
-                    hint: '', // Menggunakan textInputAction dengan huruf kecil
+                    hint: '',
                   ),
                 ),
-
-                // Kata Sandi
                 SizedBox(height: 12.0),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -83,39 +119,35 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ],
                 ),
-
-                // TextField Kata Sandi
                 SizedBox(height: 3.0),
                 Container(
                   constraints: BoxConstraints(
                     maxWidth: 340.0,
                   ),
-                  child: CustomTextField( // Mengganti CustomTextField menjadi CostumTextField
-                    controller: passwordController, 
+                  child: CustomTextField(
+                    controller: passwordController,
                     textInputType: TextInputType.visiblePassword,
                     textInputAction: TextInputAction.done,
                     prefixIcon: 'assets/img/Lock.png',
                     hint: '',
                     isObscure: isObscure,
                     hasSuffix: true,
-                    onPressed: (){
+                    onPressed: () {
                       setState(() {
-                        isObscure = ! isObscure;
+                        isObscure = !isObscure;
                       });
-                    }, 
+                    },
                   ),
                 ),
-
-
                 SizedBox(height: 9.0),
                 Align(
                   alignment: FractionalOffset(0.92, 0.0),
                   child: GestureDetector(
                     onTap: () {
-                      // Navigasi ke halaman lupa kata sandi
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => LupaKataSandi()),
+                        MaterialPageRoute(
+                            builder: (context) => LupaKataSandi()),
                       );
                     },
                     child: Text(
@@ -126,16 +158,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 SizedBox(height: 30.0),
                 ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => NavbarScreen(onTabPressed: (p0) {
-                        
-                      },)),
-                    );
-                  },
+                  onPressed:
+                      _login, // Panggil fungsi _login saat tombol ditekan
                   style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(horizontal: 143.0, vertical: 12.0), // Sesuaikan dengan kebutuhan
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 143.0, vertical: 12.0),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0),
                     ),
@@ -143,28 +170,27 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   child: Text(
                     'MASUK',
-                    style: TextStyle(color: Colors.white).
-                    copyWith(
+                    style: TextStyle(color: Colors.white).copyWith(
                       fontSize: 16.0,
                     ),
                   ),
                 ),
-
                 SizedBox(height: 18.0),
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: ConstrainedBox(
                     constraints: BoxConstraints(
-                      minWidth: 100.0,  // Ganti dengan lebar minimum yang diinginkan
+                      minWidth: 100.0,
                     ),
                     child: ElevatedButton(
                       onPressed: () {},
                       style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(vertical: 11.0, horizontal: 83.0),
+                        padding: EdgeInsets.symmetric(
+                            vertical: 11.0, horizontal: 83.0),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8.0),
                         ),
-                        primary: Colors.white, 
+                        primary: Colors.white,
                         side: BorderSide(
                           color: AppColors.gray200,
                         ),
@@ -180,7 +206,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           SizedBox(width: 8.0),
                           Text(
                             'Masuk dengan Google',
-                            style: TextStyle(color: Colors.black).copyWith(  // Menggunakan warna kontras agar terlihat
+                            style: TextStyle(color: Colors.black).copyWith(
                               fontSize: 14.0,
                             ),
                           ),
@@ -189,8 +215,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                 ),
-
-               SizedBox(height: 50.0),
+                SizedBox(height: 50.0),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -198,8 +223,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: Padding(
                         padding: const EdgeInsets.only(left: 16.0),
                         child: GestureDetector(
-                          onTap: (){
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => HalamanDaftar()));
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => HalamanDaftar()));
                           },
                           child: RichText(
                             text: TextSpan(
@@ -216,8 +244,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             textAlign: TextAlign.center,
                           ),
+                        ),
                       ),
-                    ),
                     ),
                   ],
                 ),

@@ -173,7 +173,10 @@ void showLogoutConfirmationDialog(BuildContext context) {
             onPressed: () {
               Navigator.pop(context); // Close the dialog
             },
-            child: Text("Tidak"),
+            child: Text(
+              "Tidak",
+              // style,
+            ),
           ),
           TextButton(
             onPressed: () {
