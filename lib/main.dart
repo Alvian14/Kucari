@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:project_kucari/page/beranda/home_screen.dart';
+import 'package:project_kucari/page/beranda/komentar.dart';
 import 'package:project_kucari/page/beranda/profil_screen.dart';
 import 'package:project_kucari/page/lupa_kata_sandi/lupaSandi_konfirmasi.dart';
 import 'package:project_kucari/src/navbar_screen.dart';
@@ -15,6 +16,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: SplashScreen(),
+      // home: Komentar(),
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:project_kucari/buang/login_page.dart';
+import 'package:project_kucari/page/beranda/komentar.dart';
 import 'package:project_kucari/page/beranda/upload_screen.dart';
 import 'package:project_kucari/page/login_screen.dart';
 import 'package:project_kucari/src/navbar_screen.dart';
@@ -284,7 +285,7 @@ class _homeSreenState extends State<homeSreen> {
                                       color: AppColors.hitam,
                                     ),
                                     onPressed: () {
-                                      // Tambahkan fungsi yang ingin dijalankan ketika tombol ditekan
+                                      Navigator.push(context, MaterialPageRoute(builder: (context) => Komentar()));
                                     },
                                   ),
                                   SizedBox(

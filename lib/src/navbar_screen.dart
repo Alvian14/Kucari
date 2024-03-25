@@ -83,7 +83,7 @@ class _NavbarScreenState extends State<NavbarScreen> {
         currentIndex: widget.selectedIndex,
         selectedItemColor: AppColors.hijau,
         unselectedItemColor: AppColors.gray100,
-        iconSize: 25,
+        iconSize: 20,
         onTap: _onItemTapped,
         showSelectedLabels: true,
         showUnselectedLabels: true,

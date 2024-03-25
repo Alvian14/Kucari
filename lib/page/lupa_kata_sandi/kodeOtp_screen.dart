@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:project_kucari/page/lupa_kata_sandi/lupaSandi_konfirmasi.dart';
 import 'package:project_kucari/src/style.dart';
-import 'package:project_kucari/widget/custom_textfield.dart';
 import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 
 class OTPScreen extends StatefulWidget {
-  const OTPScreen({super.key});
+  const OTPScreen({Key? key}) : super(key: key);
 
   @override
   State<OTPScreen> createState() => _OTPScreenState();
@@ -14,6 +14,7 @@ class _OTPScreenState extends State<OTPScreen> {
   final passwordController = TextEditingController();
   final passwordforController = TextEditingController();
   bool isObscure = true;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,7 +23,6 @@ class _OTPScreenState extends State<OTPScreen> {
           'Lupa Kata Sandi',
           style: TextStyles.body,
         ),
-        // backgroundColor: AppColors.putih,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
@@ -51,19 +51,16 @@ class _OTPScreenState extends State<OTPScreen> {
                   numberOfFields: 4,
                   borderRadius: BorderRadius.circular(8),
                   borderColor: AppColors.gray200,
-                  //set to true to show as box or false to show as dash
                   showFieldAsBox: true,
-                  //runs when a code is typed in
                   onCodeChanged: (String code) {
                     //handle validation or checks here
                   },
-                  //runs when every textfield is filled
                   onSubmit: (String verificationCode) {
                     showDialog(
                       context: context,
                       builder: (context) {
                         return AlertDialog(
-                          title: Text("Verification Code"),
+                          title: Text("Verifikasi Kode"),
                           content: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -73,7 +70,7 @@ class _OTPScreenState extends State<OTPScreen> {
                         );
                       },
                     );
-                  }, // end onSubmit
+                  },
                 ),
                 SizedBox(height: 20),
                 Text(
@@ -103,16 +100,19 @@ class _OTPScreenState extends State<OTPScreen> {
                     ),
                   ],
                 ),
-                SizedBox(height: 270),
+                SizedBox(height: 250),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => NewPass()),
+                    );
+                  },
                   style: ElevatedButton.styleFrom(
                     padding: EdgeInsets.symmetric(
-                        horizontal: 145.0,
-                        vertical: 20.0), // Sesuaikan dengan kebutuhan
+                        horizontal: 145.0, vertical: 16.0),
                     shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(8.0), // Tidak ada radius
+                      borderRadius: BorderRadius.circular(8.0),
                     ),
                     backgroundColor: AppColors.hijau,
                   ),

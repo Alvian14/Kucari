@@ -15,6 +15,7 @@ class _NotifScreenState extends State<NotifScreen> {
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
+          toolbarHeight: 70,
           elevation: 3,
           surfaceTintColor: AppColors.putih,
           shadowColor: AppColors.hitam,

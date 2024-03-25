@@ -27,7 +27,7 @@ class _UploadScreenState extends State<UploadScreen> {
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
-          toolbarHeight: 60,
+          toolbarHeight: 70,
           surfaceTintColor: AppColors.putih,
           backgroundColor: AppColors.putih,
           elevation: 5,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project_kucari/page/lupa_kata_sandi/kodeOtp_screen.dart';
 import 'package:project_kucari/src/style.dart';
 import 'package:project_kucari/widget/custom_textfield.dart';
 
@@ -30,7 +31,7 @@ class _LupaKataSandi extends State<LupaKataSandi> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                SizedBox(height:30.0),
+                SizedBox(height: 30.0),
                 Image.asset(
                   'assets/img/lupaSandi.png',
                 ),
@@ -43,17 +44,17 @@ class _LupaKataSandi extends State<LupaKataSandi> {
                 Padding(
                   padding: EdgeInsets.all(16.0),
                   child: Text(
-                  'Silakan masukkan No WhatsApp yang telah terdaftar pada akun anda.',
-                  style: TextStyles.hint,
-                  textAlign: TextAlign.center,
-                ),
+                    'Silakan masukkan No WhatsApp yang telah terdaftar pada akun anda.',
+                    style: TextStyles.hint,
+                    textAlign: TextAlign.center,
+                  ),
                 ),
                 SizedBox(height: 5.0),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.only(left:16.0),
+                      padding: const EdgeInsets.only(left: 16.0),
                       child: Text(
                         'WhatsApp',
                         style: TextStyles.title,
@@ -74,21 +75,27 @@ class _LupaKataSandi extends State<LupaKataSandi> {
                     hint: 'No WhatsApp',
                   ),
                 ),
-
                 SizedBox(height: 30.0),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => OTPScreen()),
+                    );
+                  },
                   style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(horizontal: 130.0, vertical: 13.0), // Sesuaikan dengan kebutuhan
+                    padding: EdgeInsets.symmetric(
+                        horizontal: 130.0,
+                        vertical: 13.0), // Sesuaikan dengan kebutuhan
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0), // Tidak ada radius
+                      borderRadius:
+                          BorderRadius.circular(8.0), // Tidak ada radius
                     ),
                     backgroundColor: AppColors.hijau,
                   ),
                   child: Text(
                     'KONFIRMASI',
-                    style: TextStyle(color: Colors.white).
-                    copyWith(
+                    style: TextStyle(color: Colors.white).copyWith(
                       fontSize: 14.0,
                     ),
                   ),
