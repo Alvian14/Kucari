@@ -8,10 +8,7 @@ if (isset($data->email) && isset($data->password)) {
     $email = $data->email;
     $password = $data->password;
 
-    // Sambungkan ke database menggunakan koneksi yang sudah disediakan
-    $conn = mysqli_connect($server, $user, $pass, $database);
-
-    // Periksa koneksi
+    // Periksa koneksi yang sudah ada dari file koneksi.php
     if (!$conn) {
         $response = array("status" => "error", "message" => "Koneksi ke database gagal: " . mysqli_connect_error());
         echo json_encode($response);
@@ -29,9 +26,6 @@ if (isset($data->email) && isset($data->password)) {
             $response = array("status" => "error", "message" => "Email atau password salah");
             echo json_encode($response);
         }
-
-        // Tutup koneksi ke database
-        mysqli_close($conn);
     }
 } else {
     // Jika data username dan password tidak tersedia, kirimkan respons gagal

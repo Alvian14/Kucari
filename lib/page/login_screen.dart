@@ -19,7 +19,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool isObscure = true;
 
   Future<void> _login() async {
-    final String apiUrl ='http://172.17.202.28/project_kucari/mobile/login.php'; // Ganti dengan alamat API login Anda
+    final String apiUrl ='http://172.16.110.33/project_kucari/mobile/login.php'; // Ganti dengan alamat API login Anda
     final response = await http.post(Uri.parse(apiUrl),
         body: jsonEncode({
           'email': emailController.text,
