@@ -35,7 +35,7 @@ class _LoginScreenState extends State<LoginScreen> {
     FocusScope.of(context).requestFocus(_passwordFocus);
   }
 
-  if (_formKey.currentState!.validate() && emailController.text.isNotEmpty && passwordController.text.isNotEmpty) {
+  if (_formKey.currentState!.validate()) {
     final String email = emailController.text.trim();
     final String password = passwordController.text.trim();
 
@@ -53,28 +53,21 @@ class _LoginScreenState extends State<LoginScreen> {
       final responseData = jsonDecode(response.body);
 
       if (responseData['status'] == 'success') {
-        // Login successful!
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text('Login Successful!'),
-            content: Text('Welcome back, $email'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text('OK'),
-              ),
-            ],
-          ),
+        // Login successful - perform additional actions here
+        // For example, navigate to a new screen
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => NavbarScreen(
+            onTabPressed: (p0){},
+          )), // Replace HomeScreen with your actual screen
         );
-        // Consider additional actions after successful login (e.g., navigate to a new screen)
       } else {
         // Login failed - handle error message from server
-        final errorMessage = responseData['message'] ?? 'Login Gagal.'; // Use default if 'message' is missing
+        final errorMessage = responseData['message'] ?? 'Gagal Masuk.'; // Use default if 'message' is missing
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: Text('Login Gagal'),
+            title: Text('Gagal Masuk'),
             content: Text(errorMessage),
             actions: [
               TextButton(
@@ -103,6 +96,7 @@ class _LoginScreenState extends State<LoginScreen> {
       );
     }
   }
+
 }
 
 
