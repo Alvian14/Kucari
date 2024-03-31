@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:project_kucari/src/style.dart';
-import 'package:project_kucari/widget/custom_textfield.dart';
+import 'package:project_kucari/widget/textfield/custom_textfield.dart';
 
 class NewPass extends StatefulWidget {
   const NewPass({super.key});

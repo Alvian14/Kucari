@@ -228,12 +228,13 @@ class _homeSreenState extends State<homeSreen> {
                                   ),
                                   ElevatedButton(
                                     onPressed: () {
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                LoginScreen()),
-                                      );
+                                      // Navigator.pushReplacement(
+                                      //   context,
+                                      //   MaterialPageRoute(
+                                      //       builder: (context) =>
+                                      //           LoginScreen()
+                                      //           ),
+                                      // );
                                     },
                                     style: ElevatedButton.styleFrom(
                                       padding: EdgeInsets.symmetric(

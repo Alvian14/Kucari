@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:project_kucari/src/style.dart';
-import 'package:project_kucari/widget/custom_textfield.dart';
+import 'package:project_kucari/widget/textfield/custom_textfield.dart';
 
 class ubahKataSandi extends StatefulWidget {
   ubahKataSandi({Key? key}) : super(key: key);

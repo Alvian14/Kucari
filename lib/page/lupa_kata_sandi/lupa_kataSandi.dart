@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:project_kucari/page/lupa_kata_sandi/kodeOtp_screen.dart';
 import 'package:project_kucari/src/style.dart';
-import 'package:project_kucari/widget/custom_textfield.dart';
+import 'package:project_kucari/widget/textfield/custom_textfield.dart';
 
 class LupaKataSandi extends StatefulWidget {
   @override

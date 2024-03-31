@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:project_kucari/page/login_screen.dart';
 import 'package:project_kucari/src/style.dart';
-import 'package:project_kucari/widget/custom_textfield.dart';
+import 'package:project_kucari/widget/textfield/custom_textfield.dart';
+import 'package:http/http.dart' as http;
 
 class HalamanDaftar extends StatefulWidget {
   @override
@@ -14,7 +16,132 @@ class _HalamanDaftarState extends State<HalamanDaftar> {
   final WhatsAppController = TextEditingController();
   final passwordController = TextEditingController();
   final passwordforController = TextEditingController();
-   bool isObscure = true;
+  bool isObscure = true;
+  FocusNode _namaFocus = FocusNode();
+  FocusNode _emailFocus = FocusNode();
+  FocusNode _whatsAppFocus = FocusNode();
+  FocusNode _passwordFocus = FocusNode();
+  FocusNode _passwordforFocus = FocusNode();
+
+   RegExp emailValidator = RegExp(
+    r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+  );
+
+  // Pola validasi untuk nomor WhatsApp
+  RegExp whatsAppValidator = RegExp(
+    r'^[0-9]{10,15}$',
+  );
+
+  @override
+  void dispose() {
+    _namaFocus.dispose();
+    _emailFocus.dispose();
+    _whatsAppFocus.dispose();
+    _passwordFocus.dispose();
+    _passwordforFocus.dispose();
+    super.dispose();
+  }
+
+  Future<void> showAlert(
+      BuildContext context, String title, String content) async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(content),
+        );
+      },
+    );
+
+    // Tunggu 2 detik
+    await Future.delayed(Duration(seconds: 1));
+
+    // Tutup alert setelah 2 detik
+    Navigator.of(context).pop();
+  }
+
+  Future<void> registerUser() async {
+  // Set focus to empty input fields before registering user
+  if (namaController.text.isEmpty) {
+    FocusScope.of(context).requestFocus(_namaFocus);
+    return;
+  } else if (emailController.text.isEmpty) {
+    FocusScope.of(context).requestFocus(_emailFocus);
+    return;
+  } else if (WhatsAppController.text.isEmpty) {
+    FocusScope.of(context).requestFocus(_whatsAppFocus);
+    return;
+  } else if (passwordController.text.isEmpty) {
+    FocusScope.of(context).requestFocus(_passwordFocus);
+    return;
+  } else if (passwordforController.text.isEmpty) {
+    FocusScope.of(context).requestFocus(_passwordforFocus);
+    return;
+  }
+
+  // Validate if passwords match
+  if (passwordController.text != passwordforController.text) {
+    showAlert(context, "Gagal", "Konfirmasi password tidak sesuai");
+    return;
+  }
+
+  // Validate email format
+  if (!emailValidator.hasMatch(emailController.text)) {
+    showAlert(context, "Gagal", "Format email tidak valid");
+    return;
+  }
+
+  // Validate WhatsApp number format
+  if (!whatsAppValidator.hasMatch(WhatsAppController.text)) {
+    showAlert(context, "Gagal", "Format nomor WhatsApp tidak valid");
+    return;
+  }
+
+  try {
+    final String apiUrl = 'http://192.168.1.2/ProjectKucari/mobile/register.php';
+
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: jsonEncode({
+        "nama_user": namaController.text,
+        "email": emailController.text,
+        "no_wa": WhatsAppController.text,
+        "password": passwordController.text,
+        "confirmPassword": passwordforController.text,
+      }),
+    );
+
+    // Periksa apakah respons berhasil atau tidak
+    if (response.statusCode == 200) {
+      // Respons sukses
+      final jsonResponse = jsonDecode(response.body); // Dekode JSON respons
+      showAlert(context, "Berhasil", jsonResponse['message']);
+      Future.delayed(Duration(seconds: 2), () {
+        // Navigasi ke halaman login setelah menampilkan pesan berhasil
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => LoginScreen()), // Ganti LoginPage dengan halaman login Anda
+        );
+      });
+    } else {
+      // Respons gagal
+      final errorMessage = jsonDecode(response.body)['message'] ?? "Gagal mendaftarkan user"; // Ambil pesan error dari respons server, jika ada
+      showAlert(context, "Gagal", errorMessage);
+    }
+  } catch (e) {
+    // Tangani kesalahan jaringan atau lainnya
+    print('Error: $e');
+    showAlert(context, "Error", "Terjadi kesalahan. Silakan coba lagi nanti.");
+  }
+}
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -35,13 +162,14 @@ class _HalamanDaftarState extends State<HalamanDaftar> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                SizedBox(height: 16.0,),
+                SizedBox(
+                  height: 16.0,
+                ),
                 Text(
                   'DAFTAR',
                   style: TextStyles.body,
                 ),
-
-               SizedBox(height: 30.0),
+                SizedBox(height: 30.0),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -61,16 +189,16 @@ class _HalamanDaftarState extends State<HalamanDaftar> {
                     maxWidth: 340.0,
                   ),
                   child: CustomTextField(
-                    controller: namaController, 
+                    controller: namaController,
                     textInputType: TextInputType.name,
                     textInputAction: TextInputAction.next,
                     prefixIcon: 'assets/img/Profile.png',
-                    hint: 'Nama', 
+                    hint: '',
+                    focusNode: _namaFocus,
+                    maxLength: 50,
                   ),
                 ),
-
-
-                SizedBox(height: 16.0),
+                // SizedBox(height: ),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -89,16 +217,15 @@ class _HalamanDaftarState extends State<HalamanDaftar> {
                     maxWidth: 340.0,
                   ),
                   child: CustomTextField(
-                   controller: emailController, 
+                    controller: emailController,
                     textInputType: TextInputType.emailAddress,
                     textInputAction: TextInputAction.next,
                     prefixIcon: 'assets/img/email.png',
-                    hint: 'email@gmail.com', 
+                    hint: '',
+                    focusNode: _emailFocus,
                   ),
                 ),
-
-
-                SizedBox(height: 16.0),
+                SizedBox(height: 22),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -117,22 +244,23 @@ class _HalamanDaftarState extends State<HalamanDaftar> {
                     maxWidth: 340.0,
                   ),
                   child: CustomTextField(
-                   controller: WhatsAppController, // Menggunakan emailController
+                    controller: WhatsAppController,
                     textInputType: TextInputType.number,
                     textInputAction: TextInputAction.next,
                     prefixIcon: 'assets/img/whatsapp.png',
-                    hint: '08123456789', 
+                    hint: '',
+                    focusNode: _whatsAppFocus,
+                    maxLength: 13,
                   ),
                 ),
-
-                SizedBox(height: 16.0),
+                // SizedBox(height: 3),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
                       padding: const EdgeInsets.only(left: 16.0),
                       child: Text(
-                        'kata Sandi',
+                        'Kata Sandi',
                         style: TextStyles.title,
                       ),
                     ),
@@ -143,24 +271,24 @@ class _HalamanDaftarState extends State<HalamanDaftar> {
                   constraints: BoxConstraints(
                     maxWidth: 340.0,
                   ),
-                  child: CustomTextField( // Mengganti CustomTextField menjadi CostumTextField
-                    controller: passwordController, 
+                  child: CustomTextField(
+                    controller: passwordController,
                     textInputType: TextInputType.visiblePassword,
                     textInputAction: TextInputAction.next,
                     prefixIcon: 'assets/img/Lock.png',
                     hint: '',
+                    maxLength: 20,
                     isObscure: isObscure,
                     hasSuffix: true,
-                    onPressed: (){
+                    focusNode: _passwordFocus,
+                    onPressed: () {
                       setState(() {
-                        isObscure = ! isObscure;
+                        isObscure = !isObscure;
                       });
-                    }, 
+                    },
                   ),
                 ),
-
-
-                SizedBox(height: 16.0),
+                SizedBox(height: 3),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -178,83 +306,43 @@ class _HalamanDaftarState extends State<HalamanDaftar> {
                   constraints: BoxConstraints(
                     maxWidth: 340.0,
                   ),
-                  child: CustomTextField( // Mengganti CustomTextField menjadi CostumTextField
-                    controller: passwordforController, 
+                  child: CustomTextField(
+                    controller: passwordforController,
                     textInputType: TextInputType.visiblePassword,
                     textInputAction: TextInputAction.done,
                     prefixIcon: 'assets/img/Lock.png',
                     hint: '',
+                    focusNode: _passwordforFocus,
+                    maxLength: 20,
                     isObscure: isObscure,
                     hasSuffix: true,
-                    onPressed: (){
+                    onPressed: () {
                       setState(() {
-                        isObscure = ! isObscure;
+                        isObscure = !isObscure;
                       });
-                    }, 
+                    },
                   ),
                 ),
-
                 SizedBox(height: 30.0),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    registerUser();
+                  },
                   style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(horizontal: 145.0, vertical: 13.0), // Sesuaikan dengan kebutuhan
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 145.0, vertical: 13.0),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0), // Tidak ada radius
+                      borderRadius: BorderRadius.circular(8.0),
                     ),
                     backgroundColor: AppColors.hijau,
                   ),
                   child: Text(
                     'DAFTAR',
-                    style: TextStyle(color: Colors.white).
-                    copyWith(
+                    style: TextStyle(color: Colors.white).copyWith(
                       fontSize: 14.0,
                     ),
                   ),
                 ),
-                
-
-                SizedBox(height: 20.0),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minWidth: 100.0,  // Ganti dengan lebar minimum yang diinginkan
-                    ),
-                    child: ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(vertical: 11.0, horizontal: 85.0),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        primary: Colors.white, 
-                        side: BorderSide(
-                          color: AppColors.gray200,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            'assets/img/search.png',
-                            width: 24.0,
-                            height: 24.0,
-                          ),
-                          SizedBox(width: 8.0),
-                          Text(
-                            'Masuk dengan Google',
-                            style: TextStyle(color: Colors.black).copyWith(  // Menggunakan warna kontras agar terlihat
-                              fontSize: 14.0,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-
-
                 SizedBox(height: 50.0),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -263,26 +351,29 @@ class _HalamanDaftarState extends State<HalamanDaftar> {
                       child: Padding(
                         padding: const EdgeInsets.only(left: 16.0),
                         child: GestureDetector(
-                          onTap: (){
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen()));
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => LoginScreen()));
                           },
-                        child: RichText(
-                          text: TextSpan(
-                            style: TextStyles.title,
-                            children: [
-                              TextSpan(
-                                text: 'Sudah punya akun? ',
-                              ),
-                              TextSpan(
-                                text: 'Masuk',
-                                style: TextStyle(color: Colors.blue),
-                              ),
-                            ],
+                          child: RichText(
+                            text: TextSpan(
+                              style: TextStyles.title,
+                              children: [
+                                TextSpan(
+                                  text: 'Sudah punya akun? ',
+                                ),
+                                TextSpan(
+                                  text: 'Masuk',
+                                  style: TextStyle(color: Colors.blue),
+                                ),
+                              ],
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                          textAlign: TextAlign.center,
                         ),
                       ),
-                    ),
                     ),
                   ],
                 ),

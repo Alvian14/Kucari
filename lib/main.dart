@@ -1,12 +1,14 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:project_kucari/page/beranda/home_screen.dart';
-import 'package:project_kucari/page/beranda/komentar.dart';
-import 'package:project_kucari/page/beranda/profil_screen.dart';
-import 'package:project_kucari/page/lupa_kata_sandi/lupaSandi_konfirmasi.dart';
-import 'package:project_kucari/src/navbar_screen.dart';
+import 'package:project_kucari/firebase_options.dart';
 // import 'package:project_kucari/page/login_screen.dart';
 import 'package:project_kucari/page/splash_screen.dart'; // Adjust the package name accordingly
-void main() {
+
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(MyApp());
 }
 
@@ -16,7 +18,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: SplashScreen(),
-      // home: Komentar(),
+      // home: UplodKegiatanPage(),
     );
   }
 }
