@@ -35,6 +35,7 @@ class _UploadScreenState extends State<UploadScreen> {
       _imageFile = image;
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -293,37 +294,37 @@ class _UploadScreenState extends State<UploadScreen> {
                   ),
 
                   // start gambar upload
-                 Padding(
-  padding: const EdgeInsets.all(20.0),
-  child: GestureDetector(
-    onTap: _pickImage,
-    child: Container(
-      width: 300, // Atur lebar container di sini
-      height: 200,
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.black),
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            spreadRadius: 3,
-            blurRadius: 7,
-            offset: Offset(0, 3),
-          ),
-        ],
-      ),
-      child: _imageFile != null
-          ? Image.file(
-              File(_imageFile!.path),
-              fit: BoxFit.cover,
-            )
-          : Icon(Icons.add_a_photo, size: 100, color: Colors.grey),
-    ),
-  ),
-),
+                  Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: GestureDetector(
+                      onTap: _pickImage,
+                      child: Container(
+                        width: 300, // Atur lebar container di sini
+                        height: 200,
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.black),
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.5),
+                              spreadRadius: 3,
+                              blurRadius: 7,
+                              offset: Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: _imageFile != null
+                            ? Image.file(
+                                File(_imageFile!.path),
+                                fit: BoxFit.cover,
+                              )
+                            : Icon(Icons.add_a_photo,
+                                size: 100, color: Colors.grey),
+                      ),
+                    ),
+                  ),
 
                   // end gambar upload
-                
                 ],
               ),
             ),

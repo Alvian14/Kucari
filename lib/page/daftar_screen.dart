@@ -99,7 +99,7 @@ class _HalamanDaftarState extends State<HalamanDaftar> {
   }
 
   try {
-    final String apiUrl = 'http://192.168.1.2/ProjectKucari/mobile/register.php';
+    final String apiUrl = 'http://172.17.202.50/ProjectKucari/mobile/register.php';
 
     final response = await http.post(
       Uri.parse(apiUrl),

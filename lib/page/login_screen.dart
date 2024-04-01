@@ -27,12 +27,14 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  Future<void> _login() async {
+ Future<void> _login() async {
   // Setel fokus sebelum memvalidasi formulir
   if (emailController.text.isEmpty) {
     FocusScope.of(context).requestFocus(_emailFocus);
+    return;
   } else if (passwordController.text.isEmpty) {
     FocusScope.of(context).requestFocus(_passwordFocus);
+    return;
   }
 
   if (_formKey.currentState!.validate()) {
@@ -41,7 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     // **API Call with Error Handling**
     try {
-      final String apiUrl = 'http://192.168.1.2/ProjectKucari/mobile/login.php'; // Replace with your actual API endpoint
+      final String apiUrl = 'http://172.17.202.50/ProjectKucari/mobile/login.php'; // Replace with your actual API endpoint
       final response = await http.post(
         Uri.parse(apiUrl),
         body: jsonEncode({
@@ -59,7 +61,7 @@ class _LoginScreenState extends State<LoginScreen> {
           context,
           MaterialPageRoute(builder: (context) => NavbarScreen(
             onTabPressed: (p0){},
-          )), // Replace HomeScreen with your actual screen
+          )), // Replace NavbarScreen with your actual screen
         );
       } else {
         // Login failed - handle error message from server
@@ -96,8 +98,8 @@ class _LoginScreenState extends State<LoginScreen> {
       );
     }
   }
-
 }
+
 
 
 
