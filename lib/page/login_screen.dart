@@ -3,9 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:project_kucari/page/daftar_screen.dart';
 import 'package:project_kucari/page/lupa_kata_sandi/lupa_kataSandi.dart';
+import 'package:project_kucari/src/ApiService.dart';
+import 'package:project_kucari/src/google.dart';
 import 'package:project_kucari/src/navbar_screen.dart';
 import 'package:project_kucari/src/style.dart';
 import 'package:project_kucari/widget/textfield/custom_textfield.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -27,50 +30,69 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
- Future<void> _login() async {
-  // Setel fokus sebelum memvalidasi formulir
-  if (emailController.text.isEmpty) {
-    FocusScope.of(context).requestFocus(_emailFocus);
-    return;
-  } else if (passwordController.text.isEmpty) {
-    FocusScope.of(context).requestFocus(_passwordFocus);
-    return;
-  }
+  Future<void> _login() async {
+    // Setel fokus sebelum memvalidasi formulir
+    if (emailController.text.isEmpty) {
+      FocusScope.of(context).requestFocus(_emailFocus);
+      return;
+    } else if (passwordController.text.isEmpty) {
+      FocusScope.of(context).requestFocus(_passwordFocus);
+      return;
+    }
 
-  if (_formKey.currentState!.validate()) {
-    final String email = emailController.text.trim();
-    final String password = passwordController.text.trim();
+    if (_formKey.currentState!.validate()) {
+      final String email = emailController.text.trim();
+      final String password = passwordController.text.trim();
 
-    // **API Call with Error Handling**
-    try {
-      final String apiUrl = 'http://172.17.202.50/ProjectKucari/mobile/login.php'; // Replace with your actual API endpoint
-      final response = await http.post(
-        Uri.parse(apiUrl),
-        body: jsonEncode({
-          'email': email,
-          'password': password,
-        }),
-      );
-
-      final responseData = jsonDecode(response.body);
-
-      if (responseData['status'] == 'success') {
-        // Login successful - perform additional actions here
-        // For example, navigate to a new screen
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => NavbarScreen(
-            onTabPressed: (p0){},
-          )), // Replace NavbarScreen with your actual screen
+      // **API Call with Error Handling**
+      try {
+        final String apiUrl = ApiService.url('login.php').toString();
+        final response = await http.post(
+          Uri.parse(apiUrl),
+          body: jsonEncode({
+            'email': email,
+            'password': password,
+          }),
         );
-      } else {
-        // Login failed - handle error message from server
-        final errorMessage = responseData['message'] ?? 'Gagal Masuk.'; // Use default if 'message' is missing
+
+        final responseData = jsonDecode(response.body);
+
+        if (responseData['status'] == 'success') {
+          // Login successful - perform additional actions here
+          // For example, navigate to a new screen
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) => NavbarScreen(
+                      onTabPressed: (p0) {},
+                    )), // Replace NavbarScreen with your actual screen
+          );
+        } else {
+          // Login failed - handle error message from server
+          final errorMessage = responseData['message'] ??
+              'Gagal Masuk.'; // Use default if 'message' is missing
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text('Gagal Masuk'),
+              content: Text(errorMessage),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text('OK'),
+                ),
+              ],
+            ),
+          );
+        }
+      } on Exception catch (e) {
+        // Handle network or other errors
+        print('Login error: $e');
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
             title: Text('Gagal Masuk'),
-            content: Text(errorMessage),
+            content: Text('Email atau Password anda salah.'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
@@ -80,28 +102,8 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         );
       }
-    } on Exception catch (e) {
-      // Handle network or other errors
-      print('Login error: $e');
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('Login Error'),
-          content: Text('An error occurred. Please try again later.'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('OK'),
-            ),
-          ],
-        ),
-      );
     }
   }
-}
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -209,7 +211,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   ElevatedButton(
                     onPressed: _login,
                     style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(horizontal: 143.0, vertical: 12.0),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 143.0, vertical: 12.0),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.0),
                       ),
@@ -229,36 +232,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       constraints: BoxConstraints(
                         minWidth: 100.0,
                       ),
-                      child: ElevatedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          padding: EdgeInsets.symmetric(vertical: 11.0, horizontal: 83.0),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          primary: Colors.white,
-                          side: BorderSide(
-                            color: AppColors.gray200,
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Image.asset(
-                              'assets/img/search.png',
-                              width: 24.0,
-                              height: 24.0,
-                            ),
-                            SizedBox(width: 8.0),
-                            Text(
-                              'Masuk dengan Google',
-                              style: TextStyle(color: Colors.black).copyWith(
-                                fontSize: 14.0,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      child: _buildButtonLogin(),
                     ),
                   ),
                   SizedBox(height: 50.0),
@@ -301,6 +275,50 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  _buildButtonLogin() {
+    return Consumer<GoogleSignService>(
+      builder: (context, google, child) {
+        return ElevatedButton(
+          onPressed: ()async {
+            await google.googleLogin();
+
+            ///
+            
+            //
+            
+          },
+          style: ElevatedButton.styleFrom(
+            padding: EdgeInsets.symmetric(vertical: 11.0, horizontal: 83.0),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+            primary: Colors.white,
+            side: BorderSide(
+              color: AppColors.gray200,
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(
+                'assets/img/search.png',
+                width: 24.0,
+                height: 24.0,
+              ),
+              SizedBox(width: 8.0),
+              Text(
+                'Masuk dengan Google',
+                style: TextStyle(color: Colors.black).copyWith(
+                  fontSize: 14.0,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

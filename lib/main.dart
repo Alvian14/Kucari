@@ -1,8 +1,12 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:project_kucari/evi.dart';
 import 'package:project_kucari/firebase_options.dart';
+import 'package:project_kucari/page/beranda/profil_screen.dart';
 // import 'package:project_kucari/page/login_screen.dart';
-import 'package:project_kucari/page/splash_screen.dart'; // Adjust the package name accordingly
+import 'package:project_kucari/page/splash_screen.dart';
+import 'package:project_kucari/src/google.dart';
+import 'package:provider/provider.dart'; // Adjust the package name accordingly
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,10 +19,16 @@ void main() async{
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: SplashScreen(),
-      // home: UplodKegiatanPage(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => GoogleSignService())
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: SplashScreen(),
+        // home: Profile(),
+       
+      ),
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:project_kucari/page/login_screen.dart';
+import 'package:project_kucari/src/ApiService.dart';
 import 'package:project_kucari/src/style.dart';
 import 'package:project_kucari/widget/textfield/custom_textfield.dart';
 import 'package:http/http.dart' as http;
@@ -99,7 +100,7 @@ class _HalamanDaftarState extends State<HalamanDaftar> {
   }
 
   try {
-    final String apiUrl = 'http://172.17.202.50/ProjectKucari/mobile/register.php';
+    final String apiUrl = ApiService.url('register.php').toString();
 
     final response = await http.post(
       Uri.parse(apiUrl),

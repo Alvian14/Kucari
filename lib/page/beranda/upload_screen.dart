@@ -294,21 +294,22 @@ class _UploadScreenState extends State<UploadScreen> {
                   ),
 
                   // start gambar upload
+                  SizedBox(height: 0.9),
                   Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: GestureDetector(
                       onTap: _pickImage,
                       child: Container(
-                        width: 300, // Atur lebar container di sini
+                        width: 400, // Atur lebar container di sini
                         height: 200,
                         decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black),
+                          // border: Border.all(color: AppColors.gray100),
                           borderRadius: BorderRadius.circular(10),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.grey.withOpacity(0.5),
                               spreadRadius: 3,
-                              blurRadius: 7,
+                              // blurRadius: 7,
                               offset: Offset(0, 3),
                             ),
                           ],
@@ -323,8 +324,31 @@ class _UploadScreenState extends State<UploadScreen> {
                       ),
                     ),
                   ),
-
+                  Text(
+                    'Note:Optional ',
+                    style: TextStyles.hint,
+                  ),
                   // end gambar upload
+                  SizedBox(height: 50),
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 100.0, vertical: 13.0),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        backgroundColor: AppColors.hijau,
+                      ),
+                      child: Text(
+                        'UBAH',
+                        style: TextStyle(color: Colors.white).copyWith(
+                          fontSize: 14.0,
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
