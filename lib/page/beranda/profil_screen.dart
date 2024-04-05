@@ -25,14 +25,66 @@ class _ProfilScreenState extends State<ProfilScreen> {
   }
 
   // Function to open image picker and select image
-  Future<void> _pickImage() async {
+  Future<void> _pickImage(ImageSource source) async {
     final XFile? selectedImage =
-        await _imagePicker.pickImage(source: ImageSource.gallery);
+        await _imagePicker.pickImage(source: source);
     if (selectedImage != null) {
       setState(() {
         _imageFile = File(selectedImage.path); // Set selected image file to state
       });
     }
+  }
+
+  Future<dynamic> _showSheet(BuildContext context) {
+    return showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      builder: (BuildContext context) {
+        return SizedBox(
+          height: 150,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              FloatingActionButton(
+                onPressed: () => _pickImage(ImageSource.camera),
+                backgroundColor: Colors.black,
+                heroTag: 'camera',
+                child: const Icon(
+                  Icons.camera_alt_outlined,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(width: 15),
+              FloatingActionButton(
+                onPressed: () => _pickImage(ImageSource.gallery),
+                backgroundColor: Colors.purple,
+                heroTag: 'gallery',
+                child: const Icon(
+                  Icons.image_outlined,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(width: 15),
+              _imageFile != null
+                  ? FloatingActionButton(
+                      onPressed: () {
+                        setState(() => _imageFile = null);
+                        Navigator.pop(context);
+                      },
+                      backgroundColor: Colors.blueGrey,
+                      heroTag: 'delete',
+                      child: const Icon(
+                        Icons.delete_outlined,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Material(),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -62,7 +114,7 @@ class _ProfilScreenState extends State<ProfilScreen> {
                   child: IconButton(
                     icon: Icon(Icons.edit),
                     onPressed: () {
-                      _pickImage(); // Call function to open image picker
+                      _showSheet(context); // Call function to show bottom sheet
                     },
                   ),
                 ),

@@ -1,11 +1,12 @@
 import 'dart:io';
-
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:project_kucari/src/ApiService.dart';
 import 'package:project_kucari/src/style.dart';
 import 'package:project_kucari/widget/textfield/custom_textfield3.dart';
 import 'package:project_kucari/widget/textfield/custom_textfield2.dart';
-import 'package:intl/intl.dart';
-import 'package:image_picker/image_picker.dart';
 
 class UploadScreen extends StatefulWidget {
   const UploadScreen({Key? key}) : super(key: key);
@@ -28,12 +29,169 @@ class _UploadScreenState extends State<UploadScreen> {
   late XFile? _imageFile = null; // Inisialisasi variabel _imageFile dengan null
 
   // Metode untuk memilih gambar dari galeri
-  Future<void> _pickImage() async {
+  Future<void> _pickImage(ImageSource source) async {
     final ImagePicker _picker = ImagePicker();
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    final XFile? image = await _picker.pickImage(source: source);
     if (image != null) {
-      _imageFile = image;
+      setState(() {
+        _imageFile = image;
+      });
     }
+  }
+
+  Future<void> _uploadImage() async {
+  // Periksa apakah ada gambar yang dipilih
+  if (_imageFile == null) {
+    // Tidak ada gambar yang diunggah, lanjutkan dengan mengirim data teks ke server
+    await postDataToServer();
+    return;
+  }
+
+  try {
+    final String apiUrl = ApiService.url('upload_image.php').toString();
+
+    // Buat objek FormData untuk mengirim file gambar
+    final imageFormData = http.MultipartFile.fromBytes(
+      'image',
+      await _imageFile!.readAsBytes(),
+      filename: 'gyhy.jpg', // Nama file yang akan dikirim
+    );
+
+    // Buat objek multipart request
+    final imageRequest = http.MultipartRequest('POST', Uri.parse(apiUrl));
+
+    // Tambahkan file gambar ke dalam request
+    imageRequest.files.add(imageFormData);
+
+    // Kirim request ke server dan tangani respons
+    final imageResponse = await imageRequest.send();
+
+    // Periksa status respons
+    if (imageResponse.statusCode == 200) {
+      // Ubah gambar berhasil diunggah
+      // Tambahkan logika lain sesuai kebutuhan aplikasi Anda
+      print('Gambar berhasil diunggah.'); 
+    } else {
+      // Tangani jika terjadi kesalahan saat mengunggah gambar
+      print('Gagal mengunggah gambar. Status code: ${imageResponse.statusCode}');
+    }
+  } catch (e) {
+    // Tangani kesalahan jika terjadi kesalahan selama proses unggah
+    print('Error uploading image: $e');
+  }
+}
+
+
+  Future<void> postDataToServer() async {
+  // Persiapkan data teks yang akan dikirim
+  Map<String, dynamic> data = {
+    'kategori': kategoriController.text,
+    'judul_postingan': judulController.text,
+    'deskripsi': deskripsiController.text,
+    'alamat': alamatontroller.text,
+    'lokasi': lokasiController.text,
+    'tanggal_postingan': tanggalController.text,
+    'waktu': waktuController.text,
+    'id_user': '5', // Ubah menjadi id_user yang sesuai dari aplikasi Anda
+    // Tambahkan data teks lainnya sesuai kebutuhan
+  };
+
+  // Kirim data teks dan gambar ke server
+  try {
+    // Kirim data teks
+    final String apiUrl = ApiService.url('upload.php').toString();
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      body: data,
+    );
+
+    if (response.statusCode == 200) {
+      // Jika pengiriman data teks berhasil, lanjutkan dengan pengunggahan gambar
+      await _uploadImage();
+      // Tampilkan pesan sukses setelah pengunggahan berhasil
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Postingan berhasil diunggah'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } else {
+      // Tangani jika pengiriman data teks gagal
+      print('Gagal mengirim data teks. Kode status: ${response.statusCode}');
+      // Tampilkan pesan error jika pengiriman gagal
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Gagal mengunggah postingan'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  } catch (error) {
+    // Tangani kesalahan jika terjadi saat mengirim data teks
+    print('Terjadi kesalahan saat mengirim data teks: $error');
+    // Tampilkan pesan error jika terjadi kesalahan
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Terjadi kesalahan saat mengunggah postingan'),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+}
+
+
+
+  // Metode untuk menampilkan modal bottom sheet
+  Future<dynamic> _showSheet(BuildContext context) {
+    return showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      builder: (BuildContext context) {
+        return SizedBox(
+          height: 150,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              FloatingActionButton(
+                onPressed: () => _pickImage(ImageSource.camera),
+                backgroundColor: Colors.black,
+                heroTag: 'camera',
+                child: const Icon(
+                  Icons.camera_alt_outlined,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(width: 15),
+              FloatingActionButton(
+                onPressed: () => _pickImage(ImageSource.gallery),
+                backgroundColor: Colors.purple,
+                heroTag: 'gallery',
+                child: const Icon(
+                  Icons.image_outlined,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(width: 15),
+              _imageFile != null
+                  ? FloatingActionButton(
+                      onPressed: () {
+                        setState(() => _imageFile = null);
+                        Navigator.pop(context);
+                      },
+                      backgroundColor: Colors.blueGrey,
+                      heroTag: 'delete',
+                      child: const Icon(
+                        Icons.delete_outlined,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Material(),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -298,7 +456,7 @@ class _UploadScreenState extends State<UploadScreen> {
                   Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: GestureDetector(
-                      onTap: _pickImage,
+                      onTap: () => _showSheet(context),
                       child: Container(
                         width: 400, // Atur lebar container di sini
                         height: 200,
@@ -332,7 +490,9 @@ class _UploadScreenState extends State<UploadScreen> {
                   SizedBox(height: 50),
                   Center(
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        postDataToServer();
+                      },
                       style: ElevatedButton.styleFrom(
                         padding: EdgeInsets.symmetric(
                             horizontal: 100.0, vertical: 13.0),

@@ -58,19 +58,16 @@ class _LoginScreenState extends State<LoginScreen> {
         final responseData = jsonDecode(response.body);
 
         if (responseData['status'] == 'success') {
-          // Login successful - perform additional actions here
-          // For example, navigate to a new screen
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
                 builder: (context) => NavbarScreen(
                       onTabPressed: (p0) {},
-                    )), // Replace NavbarScreen with your actual screen
+                    )),
           );
         } else {
-          // Login failed - handle error message from server
           final errorMessage = responseData['message'] ??
-              'Gagal Masuk.'; // Use default if 'message' is missing
+              'Gagal Masuk.'; 
           showDialog(
             context: context,
             builder: (context) => AlertDialog(
@@ -86,7 +83,6 @@ class _LoginScreenState extends State<LoginScreen> {
           );
         }
       } on Exception catch (e) {
-        // Handle network or other errors
         print('Login error: $e');
         showDialog(
           context: context,
@@ -104,6 +100,9 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     }
   }
+
+
+  
 
   @override
   Widget build(BuildContext context) {
