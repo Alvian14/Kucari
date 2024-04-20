@@ -1,19 +1,113 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:project_kucari/buang/login_page.dart';
 import 'package:project_kucari/page/beranda/komentar.dart';
 import 'package:project_kucari/page/beranda/upload_screen.dart';
 import 'package:project_kucari/page/login_screen.dart';
+import 'package:project_kucari/src/ApiService.dart';
 import 'package:project_kucari/src/navbar_screen.dart';
 import 'package:project_kucari/src/style.dart';
+import 'package:http/http.dart' as http;
 
-class homeSreen extends StatefulWidget {
-  const homeSreen({super.key});
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({Key? key, required this.userId});
+
+  final int userId;
 
   @override
-  State<homeSreen> createState() => _homeSreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _homeSreenState extends State<homeSreen> {
+class _HomeScreenState extends State<HomeScreen> {
+  late String _username = '';
+  late String _kategori = '';
+  late String _deskripsi = '';
+  late String _tgl = '';
+  late String _jam = '';
+  // late String _foto_postingan = '';
+  List<dynamic> posting = [];
+  File? _imageFile;
+
+  @override
+  void initState() {
+    // _fetchUserImage();
+    super.initState();
+    _fetchUserData();
+    _fetchPostingan();
+  }
+
+  // Future<void> fetchPostings() async {
+  //   final String apiUrl = ApiService.url('postingan.php').toString();
+  //   try {
+  //     final response = await http.get(Uri.parse(apiUrl));
+  //     if (response.statusCode == 200) {
+  //       setState(() {
+  //         posting = json.decode(response.body)['posting'];
+  //       });
+  //     } else {
+  //       throw Exception('Failed to load postings');
+  //     }
+  //   } catch (e) {
+  //     throw Exception('Error fetching postings: $e');
+  //   }
+  // }
+
+  Future<void> _fetchUserImage() async {
+    final String apiUrl = ApiService.url('get_user_image.php')
+        .toString(); // Ensure correct endpoint name
+    final response =
+        await http.get(Uri.parse('$apiUrl?userId=${widget.userId}'));
+    if (response.statusCode == 200) {
+      final imageData = json.decode(response.body);
+      final fileName = imageData['fileName'];
+      if (fileName != null && fileName.isNotEmpty) {
+        setState(() {
+          _imageFile = File('images/$fileName'); // Ensure correct file path
+        });
+      }
+    } else {
+      throw Exception('Failed to load user image');
+    }
+  }
+
+  Future<void> _fetchUserData() async {
+    final String apiUrl = ApiService.url('user.php')
+        .toString(); // Ganti 'user.php' dengan nama endpoint yang benar
+    final response =
+        await http.get(Uri.parse('$apiUrl?userId=${widget.userId}'));
+    if (response.statusCode == 200) {
+      final userData = json.decode(response.body);
+      setState(() {
+        _username = userData[
+            'username']; // Ubah 'username' sesuai dengan key yang benar di respons API
+      });
+    } else {
+      throw Exception('Failed to load user data');
+    }
+  }
+
+  Future<void> _fetchPostingan() async {
+    final String apiUrl = ApiService.url('postingan.php')
+        .toString(); // Ganti 'user.php' dengan nama endpoint yang benar
+    final response =
+        await http.get(Uri.parse('$apiUrl?userId=${widget.userId}'));
+    if (response.statusCode == 200) {
+      final pos = json.decode(response.body);
+      setState(() {
+        _kategori = pos['kategori'];
+        _deskripsi = pos['deskripsi'];
+        _tgl = pos['tanggal_postingan'];
+        _jam = pos['jam_postingan'];
+        // _foto_postingan = userData['foto_postingan'];
+      });
+    } else {
+      throw Exception('Failed to load user data');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -22,11 +116,9 @@ class _homeSreenState extends State<homeSreen> {
         appBar: AppBar(
           toolbarHeight: 80,
           surfaceTintColor: AppColors.putih,
-          backgroundColor: AppColors
-              .putih, 
+          backgroundColor: AppColors.putih,
           elevation: 0,
-          shadowColor: AppColors
-              .hitam, 
+          shadowColor: AppColors.hitam,
           title: Padding(
             padding: const EdgeInsets.only(top: 20, bottom: 10),
             child: Row(
@@ -34,11 +126,13 @@ class _homeSreenState extends State<homeSreen> {
               children: [
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                  children: <Widget>[
                     CircleAvatar(
                       radius: 25.0,
-                      backgroundImage: AssetImage('assets/img/Profile.png'),
-                      backgroundColor: AppColors.hijauMuda,
+                      backgroundImage: _imageFile != null
+                          ? FileImage(_imageFile!)
+                          : AssetImage('assets/img/logoKucari.png')
+                              as ImageProvider,
                     ),
                     SizedBox(width: 10.0),
                     Column(
@@ -49,7 +143,7 @@ class _homeSreenState extends State<homeSreen> {
                           style: TextStyles.hint,
                         ),
                         Text(
-                          'Tiyaaa',
+                          _username,
                           style: TextStyles.username,
                         ),
                       ],
@@ -66,10 +160,15 @@ class _homeSreenState extends State<homeSreen> {
                   onPressed: () {
                     Navigator.pushReplacement(
                       context,
-                        MaterialPageRoute(builder: (context) => NavbarScreen(
-                          selectedIndex: 2,onTabPressed: (p0) {
-                        },),
+                      MaterialPageRoute(
+                        builder: (context) => NavbarScreen(
+                          userId: widget.userId,
+                          onTabPressed: (index) {
+                            print('Tab $index selected');
+                          },
+                          selectedIndex: 2,
                         ),
+                      ),
                     );
                   },
                 ),
@@ -89,10 +188,8 @@ class _homeSreenState extends State<homeSreen> {
                       SizedBox(height: 20),
                       Container(
                         decoration: BoxDecoration(
-                          // color: AppColors.hijauMuda,
                           borderRadius: BorderRadius.circular(15),
                         ),
-                        // padding: EdgeInsets.all(20),
                         child: Card(
                           surfaceTintColor: AppColors.hijauMuda,
                           color: AppColors.hijauMuda,
@@ -102,8 +199,8 @@ class _homeSreenState extends State<homeSreen> {
                             child: Column(
                               children: [
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment
-                                      .spaceBetween, // Mengatur jarak di antara widget
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Column(
                                       crossAxisAlignment:
@@ -133,7 +230,6 @@ class _homeSreenState extends State<homeSreen> {
                                           AssetImage('assets/img/logohome.png'),
                                       width: 100,
                                       height: 100,
-                                      // Sesuaikan ukuran dan path gambar sesuai kebutuhan
                                     ),
                                   ],
                                 ),
@@ -142,9 +238,14 @@ class _homeSreenState extends State<homeSreen> {
                                   onPressed: () {
                                     Navigator.pushReplacement(
                                       context,
-                                      MaterialPageRoute(builder: (context) => NavbarScreen(
-                                        selectedIndex: 1,onTabPressed: (p0) {
-                                      },),
+                                      MaterialPageRoute(
+                                        builder: (context) => NavbarScreen(
+                                          userId: widget.userId,
+                                          onTabPressed: (index) {
+                                            print('Tab $index selected');
+                                          },
+                                          selectedIndex: 1,
+                                        ),
                                       ),
                                     );
                                   },
@@ -183,7 +284,7 @@ class _homeSreenState extends State<homeSreen> {
                         ],
                       ),
                       SizedBox(height: 10),
-                      //continer
+                      //container
                       Container(
                         child: Column(
                           children: [
@@ -208,17 +309,17 @@ class _homeSreenState extends State<homeSreen> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            'Tiyaaa',
+                                            'Vita',
                                             style: TextStyles.bodybold,
                                           ),
                                           Row(
                                             children: [
                                               Text(
-                                                '19:30',
+                                                _jam,
                                               ),
                                               SizedBox(width: 10),
                                               Text(
-                                                '22/09/2024',
+                                                _tgl,
                                               ),
                                             ],
                                           ),
@@ -227,20 +328,10 @@ class _homeSreenState extends State<homeSreen> {
                                     ],
                                   ),
                                   ElevatedButton(
-                                    onPressed: () {
-                                      // Navigator.pushReplacement(
-                                      //   context,
-                                      //   MaterialPageRoute(
-                                      //       builder: (context) =>
-                                      //           LoginScreen()
-                                      //           ),
-                                      // );
-                                    },
+                                    onPressed: () {},
                                     style: ElevatedButton.styleFrom(
                                       padding: EdgeInsets.symmetric(
-                                          horizontal: 10.0,
-                                          vertical:
-                                              1.0), // Sesuaikan dengan kebutuhan
+                                          horizontal: 10.0, vertical: 1.0),
                                       shape: RoundedRectangleBorder(
                                         borderRadius:
                                             BorderRadius.circular(30.0),
@@ -248,7 +339,7 @@ class _homeSreenState extends State<homeSreen> {
                                       backgroundColor: AppColors.hijau,
                                     ),
                                     child: Text(
-                                      'Ditemukan',
+                                      _kategori,
                                       style: TextStyles.label,
                                     ),
                                   ),
@@ -258,7 +349,8 @@ class _homeSreenState extends State<homeSreen> {
                             Align(
                               alignment: Alignment.topLeft,
                               child: Text(
-                                'Sebuah kucing berwarna oren yang tidak diketahui namanya',
+                                // 'Sebuah kucing berwarna oren yang tidak diketahui namanya',
+                                _deskripsi,
                                 maxLines: 3,
                                 overflow: TextOverflow.ellipsis,
                                 textAlign: TextAlign.justify,
@@ -286,18 +378,19 @@ class _homeSreenState extends State<homeSreen> {
                                       color: AppColors.gray100,
                                     ),
                                     onPressed: () {
-                                      Navigator.push(context, MaterialPageRoute(builder: (context) => Komentar()));
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  Komentar()));
                                     },
                                   ),
-                                  SizedBox(
-                                      width:
-                                          1.0), // Sesuaikan jarak antara ikon dan teks
+                                  SizedBox(width: 1.0),
                                   Text(
                                     'Komentar',
                                     style: TextStyle(
                                       color: AppColors.hitam,
                                       fontSize: 16.0,
-                                      // Sesuaikan dengan gaya teks yang diinginkan
                                     ),
                                   ),
                                 ],
@@ -307,128 +400,123 @@ class _homeSreenState extends State<homeSreen> {
                         ),
                       ),
                       SizedBox(height: 10),
-                      //continer
-                      Container(
-                        child: Column(
-                          children: [
-                            Container(
-                              height: 1,
-                              color: AppColors.gray100,
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(5, 10, 5, 10),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: [
-                                      CircleAvatar(
-                                        backgroundColor: AppColors.hijau,
-                                      ),
-                                      SizedBox(width: 10),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            'Tiyaaa',
-                                            style: TextStyles.bodybold,
-                                          ),
-                                          Row(
-                                            children: [
-                                              Text(
-                                                '19:30',
-                                              ),
-                                              SizedBox(width: 10),
-                                              Text(
-                                                '22/09/2024',
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                  ElevatedButton(
-                                    onPressed: () {
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                LoginScreen()),
-                                      );
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 10.0,
-                                          vertical:
-                                              1.0), // Sesuaikan dengan kebutuhan
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(30.0),
-                                      ),
-                                      backgroundColor: AppColors.merahPudar,
-                                    ),
-                                    child: Text(
-                                      'Kehilangan',
-                                      style: TextStyles.label,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Align(
-                              alignment: Alignment.topLeft,
-                              child: Text(
-                                'Sebuah kucing berwarna oren yang tidak diketahui namanya',
-                                maxLines: 3,
-                                overflow: TextOverflow.ellipsis,
-                                textAlign: TextAlign.justify,
-                              ),
-                            ),
-                            SizedBox(height: 20),
-                            Container(
-                              height: 200,
-                              width: double.infinity,
-                              child: Image.network(
-                                'https://asset.kompas.com/crops/PjtznDXwZQ4vrjNDVLmpCj-2R4g=/19x5:960x633/1200x800/data/photo/2022/01/05/61d54b808e254.jpg',
-                                fit: BoxFit.fitWidth,
-                              ),
-                            ),
-                            SizedBox(height: 1),
-                            Align(
-                              alignment: Alignment.topLeft,
-                              child: Row(
-                                children: [
-                                  IconButton(
-                                    icon: Image.asset(
-                                      'assets/icon/komentar.png',
-                                      width: 24.0,
-                                      height: 24.0,
-                                      color: AppColors.hitam,
-                                    ),
-                                    onPressed: () {
-                                      // Tambahkan fungsi yang ingin dijalankan ketika tombol ditekan
-                                    },
-                                  ),
-                                  SizedBox(
-                                      width:
-                                          1.0), // Sesuaikan jarak antara ikon dan teks
-                                  Text(
-                                    'Komentar',
-                                    style: TextStyle(
-                                      color: AppColors.hitam,
-                                      fontSize: 16.0,
-                                      // Sesuaikan dengan gaya teks yang diinginkan
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      //container
+                      // Container(
+                      //   child: Column(
+                      //     children: [
+                      //       Container(
+                      //         height: 1,
+                      //         color: AppColors.gray100,
+                      //       ),
+                      //       Padding(
+                      //         padding: const EdgeInsets.fromLTRB(5, 10, 5, 10),
+                      //         child: Row(
+                      //           mainAxisAlignment:
+                      //               MainAxisAlignment.spaceBetween,
+                      //           children: [
+                      //             Row(
+                      //               children: [
+                      //                 CircleAvatar(
+                      //                   backgroundColor: AppColors.hijau,
+                      //                 ),
+                      //                 SizedBox(width: 10),
+                      //                 Column(
+                      //                   crossAxisAlignment:
+                      //                       CrossAxisAlignment.start,
+                      //                   children: [
+                      //                     Text(
+                      //                       'Tiyaaa',
+                      //                       style: TextStyles.bodybold,
+                      //                     ),
+                      //                     Row(
+                      //                       children: [
+                      //                         Text(
+                      //                           '19:30',
+                      //                         ),
+                      //                         SizedBox(width: 10),
+                      //                         Text(
+                      //                           '22/09/2024',
+                      //                         ),
+                      //                       ],
+                      //                     ),
+                      //                   ],
+                      //                 ),
+                      //               ],
+                      //             ),
+                      //             ElevatedButton(
+                      //               onPressed: () {
+                      //                 Navigator.pushReplacement(
+                      //                   context,
+                      //                   MaterialPageRoute(
+                      //                       builder: (context) =>
+                      //                           LoginScreen()),
+                      //                 );
+                      //               },
+                      //               style: ElevatedButton.styleFrom(
+                      //                 padding: EdgeInsets.symmetric(
+                      //                     horizontal: 10.0, vertical: 1.0),
+                      //                 shape: RoundedRectangleBorder(
+                      //                   borderRadius:
+                      //                       BorderRadius.circular(30.0),
+                      //                 ),
+                      //                 backgroundColor: AppColors.merahPudar,
+                      //               ),
+                      //               child: Text(
+                      //                 'Kehilangan',
+                      //                 style: TextStyles.label,
+                      //               ),
+                      //             ),
+                      //           ],
+                      //         ),
+                      //       ),
+                      //       Align(
+                      //         alignment: Alignment.topLeft,
+                      //         child: Text(
+                      //           'Sebuah kucing berwarna oren yang tidak diketahui namanya',
+                      //           maxLines: 3,
+                      //           overflow: TextOverflow.ellipsis,
+                      //           textAlign: TextAlign.justify,
+                      //         ),
+                      //       ),
+                      //       SizedBox(height: 20),
+                      //       Container(
+                      //         height: 200,
+                      //         width: double.infinity,
+                      //         child: Image.network(
+                      //           'https://asset.kompas.com/crops/PjtznDXwZQ4vrjNDVLmpCj-2R4g=/19x5:960x633/1200x800/data/photo/2022/01/05/61d54b808e254.jpg',
+                      //           fit: BoxFit.fitWidth,
+                      //         ),
+                      //       ),
+                      //       SizedBox(height: 1),
+                      //       Align(
+                      //         alignment: Alignment.topLeft,
+                      //         child: Row(
+                      //           children: [
+                      //             IconButton(
+                      //               icon: Image.asset(
+                      //                 'assets/icon/komentar.png',
+                      //                 width: 24.0,
+                      //                 height: 24.0,
+                      //                 color: AppColors.hitam,
+                      //               ),
+                      //               onPressed: () {
+                      //                 // Tambahkan fungsi yang ingin dijalankan ketika tombol ditekan
+                      //               },
+                      //             ),
+                      //             SizedBox(width: 1.0),
+                      //             Text(
+                      //               'Komentar',
+                      //               style: TextStyle(
+                      //                 color: AppColors.hitam,
+                      //                 fontSize: 16.0,
+                      //               ),
+                      //             ),
+                      //           ],
+                      //         ),
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),
