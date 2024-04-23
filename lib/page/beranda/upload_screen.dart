@@ -9,7 +9,8 @@ import 'package:project_kucari/widget/textfield/custom_textfield3.dart';
 import 'package:project_kucari/widget/textfield/custom_textfield2.dart';
 
 class UploadScreen extends StatefulWidget {
-  const UploadScreen({Key? key}) : super(key: key);
+  const UploadScreen({Key? key, required this.userId});
+  final int userId;
 
   @override
   State<UploadScreen> createState() => _UploadScreenState();
@@ -19,126 +20,48 @@ class _UploadScreenState extends State<UploadScreen> {
   final kategoriController = TextEditingController();
   final judulController = TextEditingController();
   final deskripsiController = TextEditingController();
-  final alamatontroller = TextEditingController();
+  final alamatController = TextEditingController();
   final lokasiController = TextEditingController();
   final tanggalController = TextEditingController();
   final waktuController = TextEditingController();
   final forController = TextEditingController();
   bool isObscure = true;
-  String selectedCategory = 'Kehilangan'; // Default category
+  // String selectedCategory = 'Kehilangan'; // Default category
   late XFile? _imageFile = null; // Inisialisasi variabel _imageFile dengan null
 
   // Metode untuk memilih gambar dari galeri
   Future<void> _pickImage(ImageSource source) async {
     final ImagePicker _picker = ImagePicker();
     final XFile? image = await _picker.pickImage(source: source);
-    if (image != null) {
-      setState(() {
-        _imageFile = image;
-      });
+    setState(() {
+      _imageFile = image;
+    });
+  }
+
+
+   Future<void> _uploadPostingan() async {
+    var request = http.MultipartRequest('POST', ApiService.url('coba.php'));
+    request.fields['id_user'] = widget.userId.toString(); // Menggunakan userId dari widget
+    request.fields['kategori'] = kategoriController.text;
+    request.fields['judul_postingan'] = judulController.text;
+    request.fields['deskripsi'] = deskripsiController.text;
+    request.fields['alamat'] = alamatController.text;
+    request.fields['lokasi'] = lokasiController.text;
+    request.fields['tanggal_postingan'] = tanggalController.text;
+    request.fields['jam_postingan'] = waktuController.text;
+
+    if (_imageFile != null) {
+      request.files.add(await http.MultipartFile.fromPath('foto_postingan', _imageFile!.path));
     }
-  }
 
-  Future<void> _uploadImage() async {
-  // Periksa apakah ada gambar yang dipilih
-  if (_imageFile == null) {
-    // Tidak ada gambar yang diunggah, lanjutkan dengan mengirim data teks ke server
-    await postDataToServer();
-    return;
-  }
-
-  try {
-    final String apiUrl = ApiService.url('upload_image.php').toString();
-
-    // Buat objek FormData untuk mengirim file gambar
-    final imageFormData = http.MultipartFile.fromBytes(
-      'image',
-      await _imageFile!.readAsBytes(),
-      filename: 'gyhy.jpg', // Nama file yang akan dikirim
-    );
-
-    // Buat objek multipart request
-    final imageRequest = http.MultipartRequest('POST', Uri.parse(apiUrl));
-
-    // Tambahkan file gambar ke dalam request
-    imageRequest.files.add(imageFormData);
-
-    // Kirim request ke server dan tangani respons
-    final imageResponse = await imageRequest.send();
-
-    // Periksa status respons
-    if (imageResponse.statusCode == 200) {
-      // Ubah gambar berhasil diunggah
-      // Tambahkan logika lain sesuai kebutuhan aplikasi Anda
-      print('Gambar berhasil diunggah.'); 
-    } else {
-      // Tangani jika terjadi kesalahan saat mengunggah gambar
-      print('Gagal mengunggah gambar. Status code: ${imageResponse.statusCode}');
-    }
-  } catch (e) {
-    // Tangani kesalahan jika terjadi kesalahan selama proses unggah
-    print('Error uploading image: $e');
-  }
-}
-
-
-  Future<void> postDataToServer() async {
-  // Persiapkan data teks yang akan dikirim
-  Map<String, dynamic> data = {
-    'kategori': kategoriController.text,
-    'judul_postingan': judulController.text,
-    'deskripsi': deskripsiController.text,
-    'alamat': alamatontroller.text,
-    'lokasi': lokasiController.text,
-    'tanggal_postingan': tanggalController.text,
-    'waktu': waktuController.text,
-    'id_user': '5', // Ubah menjadi id_user yang sesuai dari aplikasi Anda
-    // Tambahkan data teks lainnya sesuai kebutuhan
-  };
-
-  // Kirim data teks dan gambar ke server
-  try {
-    // Kirim data teks
-    final String apiUrl = ApiService.url('upload.php').toString();
-    final response = await http.post(
-      Uri.parse(apiUrl),
-      body: data,
-    );
+    var response = await request.send();
 
     if (response.statusCode == 200) {
-      // Jika pengiriman data teks berhasil, lanjutkan dengan pengunggahan gambar
-      await _uploadImage();
-      // Tampilkan pesan sukses setelah pengunggahan berhasil
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Postingan berhasil diunggah'),
-          backgroundColor: Colors.green,
-        ),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Postingan berhasil diunggah')));
     } else {
-      // Tangani jika pengiriman data teks gagal
-      print('Gagal mengirim data teks. Kode status: ${response.statusCode}');
-      // Tampilkan pesan error jika pengiriman gagal
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Gagal mengunggah postingan'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal mengunggah postingan')));
     }
-  } catch (error) {
-    // Tangani kesalahan jika terjadi saat mengirim data teks
-    print('Terjadi kesalahan saat mengirim data teks: $error');
-    // Tampilkan pesan error jika terjadi kesalahan
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Terjadi kesalahan saat mengunggah postingan'),
-        backgroundColor: Colors.red,
-      ),
-    );
   }
-}
-
 
 
   // Metode untuk menampilkan modal bottom sheet
@@ -301,7 +224,7 @@ class _UploadScreenState extends State<UploadScreen> {
                       maxWidth: 370.0,
                     ),
                     child: CustomTextField2(
-                      controller: alamatontroller,
+                      controller: alamatController,
                       textInputType: TextInputType.text,
                       textInputAction: TextInputAction.next,
                       dropdownItems: [
@@ -491,7 +414,7 @@ class _UploadScreenState extends State<UploadScreen> {
                   Center(
                     child: ElevatedButton(
                       onPressed: () {
-                        postDataToServer();
+                        _uploadPostingan();
                       },
                       style: ElevatedButton.styleFrom(
                         padding: EdgeInsets.symmetric(
@@ -502,7 +425,7 @@ class _UploadScreenState extends State<UploadScreen> {
                         backgroundColor: AppColors.hijau,
                       ),
                       child: Text(
-                        'UBAH',
+                        'Unggah',
                         style: TextStyle(color: Colors.white).copyWith(
                           fontSize: 14.0,
                         ),
