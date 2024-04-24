@@ -7,45 +7,39 @@ import 'package:project_kucari/page/beranda/upload_screen.dart';
 import 'package:project_kucari/src/style.dart'; 
 
 class NavbarScreen extends StatefulWidget {
+  final int userId;
+  final Function(int) onTabPressed;
   int selectedIndex;
-  final Function(int) onTabPressed; // Tambahkan baris ini
 
-  NavbarScreen({Key? key, required this.onTabPressed, this.selectedIndex = 0}) : super(key: key); // Tambahkan baris ini
+  NavbarScreen({Key? key, required this.userId, required this.onTabPressed, this.selectedIndex = 0}) : super(key: key);
 
   @override
   _NavbarScreenState createState() => _NavbarScreenState();
+
+  static List<Widget> initWidgetOptions(int userId) {
+    return [
+      HomeScreen(userId: userId),
+      UploadScreen(userId: userId),
+      NotifScreen(),
+      ProfilScreen(userId: userId),
+    ];
+  }
 }
 
 class _NavbarScreenState extends State<NavbarScreen> {
+  late List<Widget> _widgetOptions;
 
+  @override
+  void initState() {
+    super.initState();
+    _widgetOptions = NavbarScreen.initWidgetOptions(widget.userId);
+  }
 
   void _onItemTapped(int index) {
-  setState(() {
-    widget.selectedIndex = index;
-  });
-
-  widget.onTabPressed(index); // Tambahkan baris ini
-}
-
-  // static int _selectedIndex = 0;
-  // static const TextStyle optionStyle =
-  //     TextStyle(fontSize: 30, fontWeight: FontWeight.w500, fontFamily: 'Inter');
-  static const List<Widget> _widgetOptions = <Widget>[
-    homeSreen(), 
-    UploadScreen(), 
-    // RiwayatScreen(),
-    NotifScreen(),
-    ProfilScreen(),
-  ];
-
-  void onTabPressed(int index) {
     setState(() {
       widget.selectedIndex = index;
     });
-  }
-
-  static void update(){
-      // widget.selectedIndex = 2;
+    widget.onTabPressed(index);
   }
 
   @override
@@ -67,15 +61,11 @@ class _NavbarScreenState extends State<NavbarScreen> {
             icon: ImageIcon(AssetImage('assets/icon/upload.png')),
             label: 'Upload',
           ),
-          // BottomNavigationBarItem(
-          //   icon: ImageIcon(AssetImage('assets/icon/note.png')),
-          //   label: 'Riwayat',
-          // ),
           BottomNavigationBarItem(
             icon: ImageIcon(AssetImage('assets/icon/bell.png')),
             label: 'Notifikasi',
           ),
-           BottomNavigationBarItem(
+          BottomNavigationBarItem(
             icon: ImageIcon(AssetImage('assets/icon/user.png')),
             label: 'Profil',
           ),
