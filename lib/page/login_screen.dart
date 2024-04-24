@@ -58,12 +58,16 @@ class _LoginScreenState extends State<LoginScreen> {
         final responseData = jsonDecode(response.body);
 
         if (responseData['status'] == 'success') {
+          // Jika login berhasil, simpan userId dan pindahkan ke NavbarScreen
+          int userId = responseData['userId']; // Misalnya, userId dikirimkan dari respons login
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-                builder: (context) => NavbarScreen(
-                      onTabPressed: (p0) {},
-                    )),
+              builder: (context) => NavbarScreen(
+                userId: userId,
+                onTabPressed: (index) {},
+              ),
+            ),
           );
         } else {
           final errorMessage = responseData['message'] ??
@@ -153,6 +157,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       textInputAction: TextInputAction.next,
                       prefixIcon: 'assets/img/email.png',
                       hint: '',
+                     
                     ),
                   ),
                   SizedBox(height: 12.0),
