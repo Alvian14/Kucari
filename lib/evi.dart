@@ -343,3 +343,69 @@ class _ProfileState extends State<Profile> {
     Navigator.pop(context);
   }
 }
+
+
+
+
+// Future<dynamic> _showSheet(BuildContext context) {
+//   return showModalBottomSheet(
+//     context: context,
+//     backgroundColor: Colors.white,
+//     builder: (BuildContext context) {
+//       return SizedBox(
+//         height: 150,
+//         child: Row(
+//           mainAxisAlignment: MainAxisAlignment.center,
+//           crossAxisAlignment: CrossAxisAlignment.center,
+//           children: [
+//             FloatingActionButton(
+//               onPressed: () => (ImageSource.camera),
+//               backgroundColor: Colors.green,
+//               heroTag: 'Edit',
+//               child: const Icon(
+//                 Icons.edit_square,
+//                 color: Colors.white,
+//               ),
+//             ),
+//             const SizedBox(width: 15),
+//             FloatingActionButton(
+//               onPressed: () {
+//                 // _deletePostingan(idPostingan, context);
+//               },
+//               backgroundColor: AppColors.tomato,
+//               heroTag: 'Hapus',
+//               child: const Icon(
+//                 Icons.delete_forever_outlined,
+//                 color: Colors.white,
+//               ),
+//             ),
+//           ],
+//         ),
+//       );
+//     },
+//   );
+// }
+
+// Future<void> _deletePostingan(int idPostingan, BuildContext context) async {
+//   try {
+//     final String apiUrl = ApiService.url('delete_postingan.php').toString();
+//     final response = await http.post(
+//       Uri.parse(apiUrl),
+//       body: {
+//         'id_postingan': idPostingan.toString(),
+//       },
+//     );
+//     if (response.statusCode == 200) {
+//       Navigator.pop(context); // Tutup bottom sheet
+//       ScaffoldMessenger.of(context)
+//           .showSnackBar(SnackBar(content: Text('Postingan berhasil dihapus')));
+//     } else {
+//       ScaffoldMessenger.of(context)
+//           .showSnackBar(SnackBar(content: Text('Gagal menghapus postingan')));
+//     }
+//   } catch (e) {
+//     print('Error deleting posting: $e');
+//     ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(content: Text('Terjadi kesalahan saat menghapus postingan')));
+//   }
+// }

@@ -44,7 +44,7 @@ class _LupaKataSandi extends State<LupaKataSandi> {
                 Padding(
                   padding: EdgeInsets.all(16.0),
                   child: Text(
-                    'Silakan masukkan No WhatsApp yang telah terdaftar pada akun anda.',
+                    'Silakan masukkan Email yang telah terdaftar pada akun anda.',
                     style: TextStyles.hint,
                     textAlign: TextAlign.center,
                   ),
@@ -56,7 +56,7 @@ class _LupaKataSandi extends State<LupaKataSandi> {
                     Padding(
                       padding: const EdgeInsets.only(left: 16.0),
                       child: Text(
-                        'WhatsApp',
+                        'Email',
                         style: TextStyles.title,
                       ),
                     )
@@ -69,10 +69,10 @@ class _LupaKataSandi extends State<LupaKataSandi> {
                   ),
                   child: CustomTextField(
                     controller: WhatsAppController,
-                    textInputType: TextInputType.number,
+                    textInputType: TextInputType.emailAddress,
                     textInputAction: TextInputAction.done,
-                    prefixIcon: 'assets/img/whatsapp.png',
-                    hint: 'No WhatsApp',
+                    prefixIcon: 'assets/img/email.png',
+                    hint: '',
                   ),
                 ),
                 SizedBox(height: 30.0),

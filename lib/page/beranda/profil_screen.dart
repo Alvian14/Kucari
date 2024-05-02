@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -5,10 +6,13 @@ import 'package:image_picker/image_picker.dart';
 import 'package:project_kucari/page/beranda/ubah_kataSandi.dart';
 import 'package:project_kucari/page/beranda/ubah_profil.dart';
 import 'package:project_kucari/page/login_screen.dart';
+import 'package:project_kucari/src/ApiService.dart';
 import 'package:project_kucari/src/style.dart';
+import 'package:http/http.dart' as http;
 
 class ProfilScreen extends StatefulWidget {
-  const ProfilScreen({Key? key}) : super(key: key);
+  const ProfilScreen({Key? key, required this.userId});
+  final int userId;
 
   @override
   _ProfilScreenState createState() => _ProfilScreenState();
@@ -17,24 +21,89 @@ class ProfilScreen extends StatefulWidget {
 class _ProfilScreenState extends State<ProfilScreen> {
   late ImagePicker _imagePicker; // Declare image picker instance
   File? _imageFile; // Declare variable to store selected image file
+  late String _username = '';
+  late String _email = '';
+  String? _imageUrl;
 
   @override
   void initState() {
     super.initState();
+    _fetchUserData();
+    _fetchUserImage();
     _imagePicker = ImagePicker(); // Initialize image picker instance
   }
 
-  // Function to open image picker and select image
+  // digunakan untuk memilih geleri atau kamera
   Future<void> _pickImage(ImageSource source) async {
-    final XFile? selectedImage =
-        await _imagePicker.pickImage(source: source);
+    final XFile? selectedImage = await _imagePicker.pickImage(source: source);
     if (selectedImage != null) {
       setState(() {
-        _imageFile = File(selectedImage.path); // Set selected image file to state
+        _imageFile = File(selectedImage.path);
       });
     }
   }
 
+  // Diguanakn untuk upload gambar profil
+  Future<void> _uploadImage() async {
+    if (_imageFile == null) {
+      // Tampilkan pesan bahwa gambar belum dipilih
+      return;
+    }
+    final String apiUrl = ApiService.url('update_pp.php').toString();
+    var request = http.MultipartRequest('POST', Uri.parse(apiUrl));
+    request.fields['userId'] = widget.userId.toString();
+
+    if (_imageFile != null) {
+      String fileName = _imageFile!.path.split('/').last;
+      var image = await http.MultipartFile.fromPath('image', _imageFile!.path);
+      request.files.add(image);
+    }
+
+    var streamedResponse = await request.send();
+
+    if (streamedResponse.statusCode == 200) {
+      print('Gambar berhasil diunggah');
+    } else {
+      print('Gagal mengunggah gambar: ${streamedResponse.reasonPhrase}');
+    }
+  }
+
+  // Digunakan untuk mengambil data gambar
+ Future<void> _fetchUserImage() async {
+    final String apiUrl = ApiService.url('get_user_image.php').toString();
+    final response =
+        await http.get(Uri.parse('$apiUrl?userId=${widget.userId}'));
+    if (response.statusCode == 200) {
+      final imageData = json.decode(response.body);
+      final fileName = imageData['fileName']; // Ini adalah URL lengkap gambar
+      if (fileName != null && fileName.isNotEmpty) {
+        setState(() {
+          _imageUrl = fileName; // Menyimpan URL gambar
+        });
+      }
+    } else {
+      throw Exception('Failed to load user image');
+    }
+  }
+
+  // diguanakn untuk mengambil data user
+  Future<void> _fetchUserData() async {
+    final String apiUrl = ApiService.url('user.php')
+        .toString(); // Ganti 'user.php' dengan nama endpoint yang benar
+    final response =
+        await http.get(Uri.parse('$apiUrl?userId=${widget.userId}'));
+    if (response.statusCode == 200) {
+      final userData = json.decode(response.body);
+      setState(() {
+        _username = userData['username'];
+        _email = userData['email'];
+      });
+    } else {
+      throw Exception('Failed to load user data');
+    }
+  }
+
+  // digunakan untuk pemilihan galeri atau kamera
   Future<dynamic> _showSheet(BuildContext context) {
     return showModalBottomSheet(
       context: context,
@@ -47,7 +116,13 @@ class _ProfilScreenState extends State<ProfilScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               FloatingActionButton(
-                onPressed: () => _pickImage(ImageSource.camera),
+                onPressed: () async {
+                  // Pick image from camera and upload it
+                  await _pickImage(ImageSource
+                      .camera); // Await to ensure image is picked before uploading
+                  await _uploadImage(); // Upload the picked image
+                  Navigator.pop(context); // Close bottom sheet after upload
+                },
                 backgroundColor: Colors.black,
                 heroTag: 'camera',
                 child: const Icon(
@@ -57,7 +132,13 @@ class _ProfilScreenState extends State<ProfilScreen> {
               ),
               const SizedBox(width: 15),
               FloatingActionButton(
-                onPressed: () => _pickImage(ImageSource.gallery),
+                onPressed: () async {
+                  // Pick image from gallery and upload it
+                  await _pickImage(ImageSource
+                      .gallery); // Await to ensure image is picked before uploading
+                  await _uploadImage(); // Upload the picked image
+                  Navigator.pop(context); // Close bottom sheet after upload
+                },
                 backgroundColor: Colors.purple,
                 heroTag: 'gallery',
                 child: const Icon(
@@ -68,14 +149,16 @@ class _ProfilScreenState extends State<ProfilScreen> {
               const SizedBox(width: 15),
               _imageFile != null
                   ? FloatingActionButton(
-                      onPressed: () {
-                        setState(() => _imageFile = null);
-                        Navigator.pop(context);
+                      onPressed: () async {
+                        // Upload the image without picking from camera or gallery
+                        await _uploadImage(); // Add await here
+                        Navigator.pop(
+                            context); // Close bottom sheet after upload
                       },
                       backgroundColor: Colors.blueGrey,
-                      heroTag: 'delete',
+                      heroTag: 'upload',
                       child: const Icon(
-                        Icons.delete_outlined,
+                        Icons.upload_outlined,
                         color: Colors.white,
                       ),
                     )
@@ -91,6 +174,7 @@ class _ProfilScreenState extends State<ProfilScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Text(
           'My Profile',
           style: TextStyles.titlehome,
@@ -103,10 +187,11 @@ class _ProfilScreenState extends State<ProfilScreen> {
               children: [
                 CircleAvatar(
                   radius: 50,
-                  // Check if image is selected, if not, use default image, else use selected image
-                  backgroundImage: _imageFile != null
-                      ? FileImage(_imageFile!)
-                      : AssetImage('assets/img/foto_profil.jpg') as ImageProvider,
+                  // backgroundColor: AppColors.hij,
+                  backgroundImage: _imageUrl != null
+                          ? NetworkImage(_imageUrl!)
+                          : AssetImage('assets/img/logoKucari.png')
+                              as ImageProvider,
                 ),
                 Positioned(
                   top: 55,
@@ -122,11 +207,11 @@ class _ProfilScreenState extends State<ProfilScreen> {
             ),
             SizedBox(height: 10),
             Text(
-              'Tiyaaa',
+              _username,
               style: TextStyles.textProfil,
             ),
             Text(
-              'email@example.com', // Ganti dengan email
+              _email, // Ganti dengan email
               style: TextStyles.hint,
             ),
 
@@ -160,9 +245,12 @@ class _ProfilScreenState extends State<ProfilScreen> {
                         ),
                         onPressed: () {
                           Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => ubahProfil()));
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  UbahProfil(userId: widget.userId),
+                            ),
+                          );
                         },
                       ),
                     ],
@@ -207,9 +295,12 @@ class _ProfilScreenState extends State<ProfilScreen> {
                         ),
                         onPressed: () {
                           Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => ubahKataSandi()));
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  UbahKataSandi(userId: widget.userId),
+                            ),
+                          );
                         },
                       ),
                     ],
@@ -222,8 +313,6 @@ class _ProfilScreenState extends State<ProfilScreen> {
                 ],
               ),
             ),
-
-            SizedBox(height: 260),
             GestureDetector(
               onTap: () {
                 showLogoutConfirmationDialog(context);

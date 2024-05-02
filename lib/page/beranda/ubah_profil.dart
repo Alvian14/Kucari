@@ -1,12 +1,106 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:project_kucari/src/ApiService.dart';
+import 'package:project_kucari/src/navbar_screen.dart';
 import 'package:project_kucari/src/style.dart';
 import 'package:project_kucari/widget/textfield/custom_textfield.dart';
 
-class ubahProfil extends StatelessWidget {
-  ubahProfil({super.key});
+class UbahProfil extends StatefulWidget {
+  final int userId;
+
+  UbahProfil({Key? key, required this.userId}) : super(key: key);
+
+  @override
+  _UbahProfilState createState() => _UbahProfilState();
+}
+
+class _UbahProfilState extends State<UbahProfil> {
   final namaController = TextEditingController();
   final emailController = TextEditingController();
-  final WhatsAppController = TextEditingController();
+  final whatsAppController = TextEditingController();
+  late String _username = '';
+  late String _email = '';
+  late String _whatsapp = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
+  }
+
+  Future<void> _updateProfile(BuildContext context) async {
+    final String apiUrl = ApiService.url('ubah_profil.php').toString();
+
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      body: {
+        'userId': widget.userId.toString(),
+        'nama': namaController.text,
+        'email': emailController.text,
+        'whatsapp': whatsAppController.text,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Sukses'),
+            content: Text('Profil berhasil diperbarui'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  // Pop the dialog first
+                  Navigator.of(context).pop();
+                  // Then navigate to the new screen
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => NavbarScreen(
+                        userId: widget.userId,
+                        onTabPressed: (index) {
+                          print('Tab $index selected');
+                        },
+                        selectedIndex: 3,
+                      ),
+                    ),
+                  );
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Terjadi kesalahan. Silakan coba lagi')),
+      );
+    }
+  }
+
+  Future<void> _fetchUserData() async {
+    final String apiUrl = ApiService.url('user.php').toString();
+
+    final response =
+        await http.get(Uri.parse('$apiUrl?userId=${widget.userId}'));
+
+    if (response.statusCode == 200) {
+      final userData = json.decode(response.body);
+      setState(() {
+        _username = userData['username'];
+        _email = userData['email'];
+        _whatsapp = userData['whatsapp'];
+        namaController.text = _username;
+        emailController.text = _email;
+        whatsAppController.text = _whatsapp;
+      });
+    } else {
+      throw Exception('Failed to load user data');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,10 +112,10 @@ class ubahProfil extends StatelessWidget {
             'Ubah Profil',
             style: TextStyles.titlehome,
           ),
-          leading: IconButton( // Tambahkan IconButton sebagai leading di AppBar
-            icon: Icon(Icons.arrow_back), // Gunakan ikon kembali dari material icons
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
             onPressed: () {
-              Navigator.pop(context); // Kembali ke halaman sebelumnya saat ikon kembali ditekan
+              Navigator.pop(context);
             },
           ),
         ),
@@ -31,10 +125,8 @@ class ubahProfil extends StatelessWidget {
               padding: EdgeInsets.all(14.0),
               child: Column(
                 children: [
-                  // start textfield nama
-                  SizedBox(
-                    height: 50,
-                  ),
+                  SizedBox(height: 50),
+                  // Nama
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -60,12 +152,8 @@ class ubahProfil extends StatelessWidget {
                       hint: '',
                     ),
                   ),
-                  // finish textfield nama
-      
-                  // start textfield email
-                  SizedBox(
-                    height: 8,
-                  ),
+                  SizedBox(height: 8),
+                  // Email
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -91,12 +179,8 @@ class ubahProfil extends StatelessWidget {
                       hint: '',
                     ),
                   ),
-                  // finish textfield email
-      
-                  // start no wa
-                  SizedBox(
-                    height: 8,
-                  ),
+                  SizedBox(height: 8),
+                  // WhatsApp
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -115,35 +199,32 @@ class ubahProfil extends StatelessWidget {
                       maxWidth: 340.0,
                     ),
                     child: CustomTextField(
-                      controller: WhatsAppController,
-                      textInputType: TextInputType.number,
+                      controller: whatsAppController,
+                      textInputType: TextInputType.phone,
                       textInputAction: TextInputAction.done,
                       prefixIcon: 'assets/img/whatsapp.png',
                       hint: '',
                     ),
                   ),
-                  // finish textfield no wa
-      
-                  // button start
                   SizedBox(height: 30.0),
+                  // Tombol Ubah
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      _updateProfile(context);
+                    },
                     style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(horizontal: 100.0, vertical: 13.0), // Sesuaikan dengan kebutuhan
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 100.0, vertical: 13.0),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0), // Tidak ada radius
+                        borderRadius: BorderRadius.circular(8.0),
                       ),
                       backgroundColor: AppColors.hijau,
                     ),
                     child: Text(
                       'UBAH',
-                      style: TextStyle(color: Colors.white).
-                      copyWith(
-                        fontSize: 14.0,
-                      ),
+                      style: TextStyle(color: Colors.white, fontSize: 14.0),
                     ),
                   ),
-                  // button Finish
                 ],
               ),
             ),

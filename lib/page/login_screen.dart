@@ -70,7 +70,8 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           );
         } else {
-          final errorMessage = responseData['message'] ??
+          final errorMessage = responseData[
+            'message'] ??
               'Gagal Masuk.'; 
           showDialog(
             context: context,

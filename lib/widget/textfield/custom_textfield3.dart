@@ -8,12 +8,14 @@ class CustomTextField3 extends StatefulWidget {
     required this.controller,
     required this.textInputType,
     required this.textInputAction,
+    this.focusNode,
     Key? key,
   }) : super(key: key);
 
   final TextEditingController controller;
   final TextInputType textInputType;
   final TextInputAction textInputAction;
+  final FocusNode? focusNode;
 
   @override
   _CustomTextField3State createState() => _CustomTextField3State();
@@ -27,6 +29,7 @@ class _CustomTextField3State extends State<CustomTextField3> {
       maxLines: null,
       keyboardType: TextInputType.multiline,
       controller: widget.controller,
+      focusNode: widget.focusNode,
       textInputAction: TextInputAction.newline, // Mengubah TextInputAction
       cursorColor: AppColors.gray700,
       textAlignVertical: TextAlignVertical.top,

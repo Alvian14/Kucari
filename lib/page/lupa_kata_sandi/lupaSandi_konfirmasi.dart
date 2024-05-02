@@ -12,17 +12,17 @@ class NewPass extends StatefulWidget {
 class _NewPassState extends State<NewPass> {
   final passwordController = TextEditingController();
   final passwordforController = TextEditingController();
-   bool isObscure = true;
+  bool isObscure = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         surfaceTintColor: AppColors.putih,
-        title: Text (
+        title: Text(
           'Buat Kata Sandi Baru',
           style: TextStyles.titlehome,
         ),
-      // backgroundColor: AppColors.putih,
+        // backgroundColor: AppColors.putih,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
@@ -37,14 +37,12 @@ class _NewPassState extends State<NewPass> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                SizedBox(height:30.0),
+                SizedBox(height: 30.0),
                 Transform.scale(
                   scale: 0.8,
-                
-                child: Image.asset(
-                  'assets/img/newPass.png',
-                  
-                ),
+                  child: Image.asset(
+                    'assets/img/newPass.png',
+                  ),
                 ),
                 SizedBox(height: 16.0),
                 Row(
@@ -64,22 +62,23 @@ class _NewPassState extends State<NewPass> {
                   constraints: BoxConstraints(
                     maxWidth: 340.0,
                   ),
-                  child: CustomTextField( // Mengganti CustomTextField menjadi CostumTextField
-                    controller: passwordController, 
+                  child: CustomTextField(
+                    // Mengganti CustomTextField menjadi CostumTextField
+                    controller: passwordController,
                     textInputType: TextInputType.visiblePassword,
                     textInputAction: TextInputAction.next,
                     prefixIcon: 'assets/img/Lock.png',
                     hint: '',
+
                     isObscure: isObscure,
                     hasSuffix: true,
-                    onPressed: (){
+                    onPressed: () {
                       setState(() {
-                        isObscure = ! isObscure;
+                        isObscure = !isObscure;
                       });
-                    }, 
+                    },
                   ),
                 ),
-
 
                 SizedBox(height: 16.0),
                 Row(
@@ -99,58 +98,60 @@ class _NewPassState extends State<NewPass> {
                   constraints: BoxConstraints(
                     maxWidth: 340.0,
                   ),
-                  child: CustomTextField( // Mengganti CustomTextField menjadi CostumTextField
-                    controller: passwordforController, 
+                  child: CustomTextField(
+                    // Mengganti CustomTextField menjadi CostumTextField
+                    controller: passwordforController,
                     textInputType: TextInputType.visiblePassword,
                     textInputAction: TextInputAction.done,
                     prefixIcon: 'assets/img/Lock.png',
                     hint: '',
                     isObscure: isObscure,
                     hasSuffix: true,
-                    onPressed: (){
+                    onPressed: () {
                       setState(() {
-                        isObscure = ! isObscure;
+                        isObscure = !isObscure;
                       });
-                    }, 
+                    },
                   ),
                 ),
                 SizedBox(height: 60.0),
                 ElevatedButton(
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(horizontal: 145.0, vertical: 16.0), // Sesuaikan dengan kebutuhan
+                    padding: EdgeInsets.symmetric(
+                        horizontal: 145.0,
+                        vertical: 16.0), // Sesuaikan dengan kebutuhan
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0), // Tidak ada radius
+                      borderRadius:
+                          BorderRadius.circular(8.0), // Tidak ada radius
                     ),
                     backgroundColor: AppColors.hijau,
                   ),
                   child: Text(
                     'LANJUT',
-                    style: TextStyle(color: Colors.white).
-                    copyWith(
+                    style: TextStyle(color: Colors.white).copyWith(
                       fontSize: 14.0,
                     ),
                   ),
                 ),
-                
-              //  SizedBox(height: 30.0),
-              //   ElevatedButton(
-              //     onPressed: () {},
-              //     style: ElevatedButton.styleFrom(
-              //       padding: EdgeInsets.symmetric(horizontal: 130.0, vertical: 13.0), // Sesuaikan dengan kebutuhan
-              //       shape: RoundedRectangleBorder(
-              //         borderRadius: BorderRadius.circular(8.0), // Tidak ada radius
-              //       ),
-              //       backgroundColor: AppColors.hijau,
-              //     ),
-              //     child: Text(
-              //       'LANJUT',
-              //       style: TextStyle(color: Colors.white,
-              //         fontSize: 14.0,
-              //       ),
-              //     ),
-              //   ),
-                
+
+                //  SizedBox(height: 30.0),
+                //   ElevatedButton(
+                //     onPressed: () {},
+                //     style: ElevatedButton.styleFrom(
+                //       padding: EdgeInsets.symmetric(horizontal: 130.0, vertical: 13.0), // Sesuaikan dengan kebutuhan
+                //       shape: RoundedRectangleBorder(
+                //         borderRadius: BorderRadius.circular(8.0), // Tidak ada radius
+                //       ),
+                //       backgroundColor: AppColors.hijau,
+                //     ),
+                //     child: Text(
+                //       'LANJUT',
+                //       style: TextStyle(color: Colors.white,
+                //         fontSize: 14.0,
+                //       ),
+                //     ),
+                //   ),
               ],
             ),
           ),

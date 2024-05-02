@@ -9,8 +9,8 @@ class CustomTextField extends StatelessWidget {
     required this.textInputAction,
     required this.prefixIcon,
     required this.hint,
-    this.focusNode, // Tambahkan properti focusNode
-    this.maxLength, 
+    this.focusNode,
+    this.maxLength,
     this.isObscure = false,
     this.hasSuffix = false,
     this.onPressed,
@@ -26,7 +26,7 @@ class CustomTextField extends StatelessWidget {
   final bool hasSuffix;
   final VoidCallback? onPressed;
   final int? maxLength;
-  final FocusNode? focusNode; // Deklarasikan focusNode sebagai parameter
+  final FocusNode? focusNode;
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +37,7 @@ class CustomTextField extends StatelessWidget {
       cursorColor: AppColors.gray700,
       obscureText: isObscure,
       maxLength: maxLength,
-      focusNode: focusNode, // Tambahkan focusNode ke dalam TextField
+      focusNode: focusNode,
       decoration: InputDecoration(
         suffixIcon: hasSuffix
             ? IconButton(
@@ -47,7 +47,8 @@ class CustomTextField extends StatelessWidget {
                 ),
               )
             : null,
-        contentPadding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 12.0),
+        contentPadding:
+            EdgeInsets.symmetric(vertical: 10.0, horizontal: 12.0),
         filled: true,
         fillColor: AppColors.gray300,
         enabledBorder: OutlineInputBorder(

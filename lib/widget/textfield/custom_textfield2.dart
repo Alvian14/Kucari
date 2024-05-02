@@ -9,6 +9,7 @@ class CustomTextField2 extends StatefulWidget {
     required this.textInputAction,
     this.enableDropdown = true,
     this.dropdownItems,
+    this.focusNode,
     Key? key,
   }) : super(key: key);
 
@@ -17,6 +18,7 @@ class CustomTextField2 extends StatefulWidget {
   final TextInputAction textInputAction;
   final bool enableDropdown;
   final List<String>? dropdownItems;
+  final FocusNode? focusNode;
 
   @override
   _CustomTextField2State createState() => _CustomTextField2State();
@@ -33,6 +35,7 @@ class _CustomTextField2State extends State<CustomTextField2> {
     return TextField(
       controller: widget.controller,
       keyboardType: TextInputType.multiline,
+      focusNode: widget.focusNode,
       textInputAction: TextInputAction.newline,
       cursorColor: AppColors.gray700,
       readOnly:

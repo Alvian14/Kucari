@@ -24,7 +24,7 @@ class _HalamanDaftarState extends State<HalamanDaftar> {
   FocusNode _passwordFocus = FocusNode();
   FocusNode _passwordforFocus = FocusNode();
 
-   RegExp emailValidator = RegExp(
+  RegExp emailValidator = RegExp(
     r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
   );
 
@@ -63,86 +63,79 @@ class _HalamanDaftarState extends State<HalamanDaftar> {
   }
 
   Future<void> registerUser() async {
-  // Set focus to empty input fields before registering user
-  if (namaController.text.isEmpty) {
-    FocusScope.of(context).requestFocus(_namaFocus);
-    return;
-  } else if (emailController.text.isEmpty) {
-    FocusScope.of(context).requestFocus(_emailFocus);
-    return;
-  } else if (WhatsAppController.text.isEmpty) {
-    FocusScope.of(context).requestFocus(_whatsAppFocus);
-    return;
-  } else if (passwordController.text.isEmpty) {
-    FocusScope.of(context).requestFocus(_passwordFocus);
-    return;
-  } else if (passwordforController.text.isEmpty) {
-    FocusScope.of(context).requestFocus(_passwordforFocus);
-    return;
-  }
+    // Set focus to empty input fields before registering user
+    if (namaController.text.trim().isEmpty) {
+      showAlert(context, "Gagal", "Nama tidak boleh hanya spasi");
+      FocusScope.of(context).requestFocus(_namaFocus);
+      return;
+    } else if (emailController.text.isEmpty) {
+      FocusScope.of(context).requestFocus(_emailFocus);
+      return;
+    } else if (WhatsAppController.text.isEmpty) {
+      FocusScope.of(context).requestFocus(_whatsAppFocus);
+      return;
+    } else if (passwordController.text.isEmpty) {
+      FocusScope.of(context).requestFocus(_passwordFocus);
+      return;
+    } else if (passwordforController.text.isEmpty) {
+      FocusScope.of(context).requestFocus(_passwordforFocus);
+      return;
+    } else if (passwordController.text != passwordforController.text) {
+      showAlert(context, "Gagal", "Konfirmasi password tidak sesuai");
+      return;
+    } else if (!emailValidator.hasMatch(emailController.text)) {
+      showAlert(context, "Gagal", "Format email tidak valid");
+      return;
+    } else if (!whatsAppValidator.hasMatch(WhatsAppController.text)) {
+      showAlert(context, "Gagal", "Format nomor WhatsApp tidak valid");
+      return;
+    } 
 
-  // Validate if passwords match
-  if (passwordController.text != passwordforController.text) {
-    showAlert(context, "Gagal", "Konfirmasi password tidak sesuai");
-    return;
-  }
+    try {
+      final String apiUrl = ApiService.url('register.php').toString();
 
-  // Validate email format
-  if (!emailValidator.hasMatch(emailController.text)) {
-    showAlert(context, "Gagal", "Format email tidak valid");
-    return;
-  }
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode({
+          "nama_user": namaController.text,
+          "email": emailController.text,
+          "no_wa": WhatsAppController.text,
+          "password": passwordController.text,
+          "confirmPassword": passwordforController.text,
+        }),
+      );
 
-  // Validate WhatsApp number format
-  if (!whatsAppValidator.hasMatch(WhatsAppController.text)) {
-    showAlert(context, "Gagal", "Format nomor WhatsApp tidak valid");
-    return;
-  }
-
-  try {
-    final String apiUrl = ApiService.url('register.php').toString();
-
-    final response = await http.post(
-      Uri.parse(apiUrl),
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-      body: jsonEncode({
-        "nama_user": namaController.text,
-        "email": emailController.text,
-        "no_wa": WhatsAppController.text,
-        "password": passwordController.text,
-        "confirmPassword": passwordforController.text,
-      }),
-    );
-
-    // Periksa apakah respons berhasil atau tidak
-    if (response.statusCode == 200) {
-      // Respons sukses
-      final jsonResponse = jsonDecode(response.body); // Dekode JSON respons
-      showAlert(context, "Berhasil", jsonResponse['message']);
-      Future.delayed(Duration(seconds: 2), () {
-        // Navigasi ke halaman login setelah menampilkan pesan berhasil
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => LoginScreen()), // Ganti LoginPage dengan halaman login Anda
-        );
-      });
-    } else {
-      // Respons gagal
-      final errorMessage = jsonDecode(response.body)['message'] ?? "Gagal mendaftarkan user"; // Ambil pesan error dari respons server, jika ada
-      showAlert(context, "Gagal", errorMessage);
+      // Periksa apakah respons berhasil atau tidak
+      if (response.statusCode == 200) {
+        // Respons sukses
+        final jsonResponse = jsonDecode(response.body); // Dekode JSON respons
+        showAlert(context, "Berhasil", jsonResponse['message']);
+        Future.delayed(Duration(seconds: 2), () {
+          // Navigasi ke halaman login setelah menampilkan pesan berhasil
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    LoginScreen()), // Ganti LoginPage dengan halaman login Anda
+          );
+        });
+      } else {
+        // Respons gagal
+        final errorMessage = jsonDecode(response.body)['message'] ??
+            "Gagal mendaftarkan user"; // Ambil pesan error dari respons server, jika ada
+        showAlert(context, "Gagal", errorMessage);
+      }
+    } catch (e) {
+      // Tangani kesalahan jaringan atau lainnya
+      print('Error: $e');
+      showAlert(
+          context, "Error", "Terjadi kesalahan. Silakan coba lagi nanti.");
     }
-  } catch (e) {
-    // Tangani kesalahan jaringan atau lainnya
-    print('Error: $e');
-    showAlert(context, "Error", "Terjadi kesalahan. Silakan coba lagi nanti.");
   }
-}
-
-
-
 
   @override
   Widget build(BuildContext context) {

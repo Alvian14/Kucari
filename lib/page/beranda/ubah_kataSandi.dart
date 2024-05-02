@@ -1,19 +1,125 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:project_kucari/page/beranda/profil_screen.dart';
+import 'package:project_kucari/src/ApiService.dart';
+import 'package:project_kucari/src/navbar_screen.dart';
 import 'package:project_kucari/src/style.dart';
+import 'dart:convert';
 import 'package:project_kucari/widget/textfield/custom_textfield.dart';
 
-class ubahKataSandi extends StatefulWidget {
-  ubahKataSandi({Key? key}) : super(key: key);
+class UbahKataSandi extends StatefulWidget {
+  final int userId;
+
+  UbahKataSandi({Key? key, required this.userId}) : super(key: key);
 
   @override
-  _ubahKataSandiState createState() => _ubahKataSandiState();
+  _UbahKataSandiState createState() => _UbahKataSandiState();
 }
 
-class _ubahKataSandiState extends State<ubahKataSandi> {
-  final passwordOldController = TextEditingController();
-  final passwordNewController = TextEditingController();
-  final passwordforController = TextEditingController();
+class _UbahKataSandiState extends State<UbahKataSandi> {
+  final TextEditingController passwordOldController = TextEditingController();
+  final TextEditingController passwordNewController = TextEditingController();
+  final TextEditingController passwordForController = TextEditingController();
   bool isObscure = true;
+  FocusNode _oldPassword = FocusNode();
+  FocusNode _newPassword = FocusNode();
+  FocusNode _confirm = FocusNode();
+
+  @override
+  void dispose() {
+    _oldPassword.dispose();
+    _newPassword.dispose();
+    _confirm.dispose();
+    super.dispose();
+  }
+
+  Future<void> showAlert(
+      BuildContext context, String title, String content) async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(content),
+        );
+      },
+    );
+
+    // Tunggu 2 detik
+    await Future.delayed(Duration(seconds: 1));
+
+    // Tutup alert setelah 2 detik
+    Navigator.of(context).pop();
+  }
+
+  Future<void> _updatePassword() async {
+    if (passwordOldController.text.isEmpty) {
+      FocusScope.of(context).requestFocus(_oldPassword);
+      return;
+    } else if (passwordNewController.text.isEmpty) {
+      FocusScope.of(context).requestFocus(_newPassword);
+      return;
+    } else if (passwordForController.text.isEmpty) {
+      FocusScope.of(context).requestFocus(_confirm);
+      return;
+    }
+
+    if (passwordNewController.text != passwordForController.text) {
+      showAlert(context, "Gagal", "Konfirmasi password tidak sesuai");
+      return;
+    }
+
+    // if (passwordOldController.text) {
+    //     showAlert(context, "Gagal", "Format email tidak valid");
+    //     return;
+    //   }
+
+    try {
+      final String apiUrl =
+          ApiService.url('ubah_katasandi_profil.php').toString();
+
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        body: {
+          'userId': widget.userId.toString(),
+          'oldPassword': passwordOldController.text,
+          'newPassword': passwordNewController.text,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        // Respons sukses
+        final jsonResponse = jsonDecode(response.body); // Dekode JSON respons
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("Pesan"),
+              content: Text(jsonResponse['message']),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Tutup dialog
+                  },
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        // Respons gagal
+        final errorMessage = jsonDecode(response.body)['message'] ??
+            "Gagal mengubah kata sandi"; // Ambil pesan error dari respons server, jika ada
+        showAlert(context, "Gagal", errorMessage);
+      }
+    } catch (e) {
+      // Tangani kesalahan jaringan atau lainnya
+      print('Error: $e');
+      showAlert(
+          context, "Error", "Terjadi kesalahan. Silakan coba lagi nanti.");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,6 +168,7 @@ class _ubahKataSandiState extends State<ubahKataSandi> {
                       textInputAction: TextInputAction.next,
                       prefixIcon: 'assets/img/Lock.png',
                       hint: '',
+                      focusNode: _oldPassword,
                       isObscure: isObscure,
                       hasSuffix: true,
                       onPressed: () {
@@ -95,6 +202,7 @@ class _ubahKataSandiState extends State<ubahKataSandi> {
                       textInputAction: TextInputAction.next,
                       prefixIcon: 'assets/img/Lock.png',
                       hint: '',
+                      focusNode: _newPassword,
                       isObscure: isObscure,
                       hasSuffix: true,
                       onPressed: () {
@@ -123,11 +231,12 @@ class _ubahKataSandiState extends State<ubahKataSandi> {
                       maxWidth: 340.0,
                     ),
                     child: CustomTextField(
-                      controller: passwordforController,
+                      controller: passwordForController,
                       textInputType: TextInputType.visiblePassword,
                       textInputAction: TextInputAction.done,
                       prefixIcon: 'assets/img/Lock.png',
                       hint: '',
+                      focusNode: _confirm,
                       isObscure: isObscure,
                       hasSuffix: true,
                       onPressed: () {
@@ -139,9 +248,10 @@ class _ubahKataSandiState extends State<ubahKataSandi> {
                   ),
                   SizedBox(height: 30.0),
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: _updatePassword,
                     style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(horizontal: 100.0, vertical: 13.0),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 100.0, vertical: 13.0),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.0),
                       ),

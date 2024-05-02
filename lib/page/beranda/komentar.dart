@@ -1,22 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:project_kucari/src/style.dart';
 
-class Komentar extends StatelessWidget {
+class Komentar extends StatefulWidget {
   const Komentar({Key? key}) : super(key: key);
+
+  @override
+  _KomentarState createState() => _KomentarState();
+}
+
+class _KomentarState extends State<Komentar> {
+  List<String> balasan = [];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 80,
-        surfaceTintColor: AppColors.putih,
-        backgroundColor: AppColors.putih,
+        backgroundColor: Colors.white,
         elevation: 3,
-        shadowColor: AppColors.hitam,
-        title: Text(
-          'Komentar',
-          style: TextStyles.body,
-        ),
+        title: Text('Komentar'),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
@@ -32,6 +34,14 @@ class Komentar extends StatelessWidget {
         isBalas: true,
         fotoProfil:
             'path/to/your/image.jpg', // Ganti dengan path ke gambar Anda
+        onBalas: (String reply) {
+          print('Balasan: $reply');
+          // Perbarui state di widget Komentar
+          setState(() {
+            balasan.add(reply);
+          });
+        },
+        balasan: balasan,
       ),
     );
   }
@@ -45,6 +55,9 @@ class KomentarWidget extends StatefulWidget {
     required this.isi,
     this.isBalas = false,
     required this.fotoProfil,
+    required this.onBalas,
+    required this.balasan,
+    this.isUser = false,
   }) : super(key: key);
 
   final String nama;
@@ -52,6 +65,9 @@ class KomentarWidget extends StatefulWidget {
   final String isi;
   final bool isBalas;
   final String fotoProfil;
+  final Function(String) onBalas;
+  final List<String> balasan;
+  final bool isUser;
 
   @override
   _KomentarWidgetState createState() => _KomentarWidgetState();
@@ -115,6 +131,58 @@ class _KomentarWidgetState extends State<KomentarWidget> {
                       ),
                     ],
                   ),
+                  if (widget.balasan.isNotEmpty)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: widget.balasan.map((reply) {
+                        return Container(
+                          margin: EdgeInsets.symmetric(vertical: 5),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              CircleAvatar(
+                                backgroundImage: AssetImage(widget.fotoProfil),
+                              ),
+                              SizedBox(width: 10),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Text(
+                                          widget.nama,
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        SizedBox(width: 5),
+                                        Text(
+                                          widget.waktu,
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.grey[600],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 5),
+                                    Container(
+                                      padding: EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[200],
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: Text(reply),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ),
                 ],
               ),
             ),
@@ -135,7 +203,9 @@ class _KomentarWidgetState extends State<KomentarWidget> {
                           controller: _replyController,
                           decoration: InputDecoration(
                             hintText: 'Balas komentar...',
-                            border: OutlineInputBorder(),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(90),
+                            ),
                           ),
                         ),
                       ),
@@ -143,8 +213,10 @@ class _KomentarWidgetState extends State<KomentarWidget> {
                         icon: Icon(Icons.send),
                         onPressed: () {
                           String reply = _replyController.text;
-                          print('Balasan: $reply');
-                          _replyController.clear();
+                          if (reply.isNotEmpty) {
+                            widget.onBalas(reply);
+                            _replyController.clear();
+                          }
                         },
                       ),
                     ],

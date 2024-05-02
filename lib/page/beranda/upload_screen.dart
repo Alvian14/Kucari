@@ -18,7 +18,7 @@ class UploadScreen extends StatefulWidget {
 
 class _UploadScreenState extends State<UploadScreen> {
   final kategoriController = TextEditingController();
-  final judulController = TextEditingController();
+  // final judulController = TextEditingController();
   final deskripsiController = TextEditingController();
   final alamatController = TextEditingController();
   final lokasiController = TextEditingController();
@@ -26,10 +26,27 @@ class _UploadScreenState extends State<UploadScreen> {
   final waktuController = TextEditingController();
   final forController = TextEditingController();
   bool isObscure = true;
-  // String selectedCategory = 'Kehilangan'; // Default category
-  late XFile? _imageFile = null; // Inisialisasi variabel _imageFile dengan null
+  FocusNode _deskripsi = FocusNode();
+  FocusNode _lokasi = FocusNode();
+  FocusNode _kategori = FocusNode();
+  FocusNode _alamat = FocusNode();
+  FocusNode _tanggal = FocusNode();
+  FocusNode _jam = FocusNode();
+  // FocusNode _foto = FocusNode();
+  late XFile? _imageFile = null;
 
-  // Metode untuk memilih gambar dari galeri
+  @override
+  void dispose() {
+    _deskripsi.dispose();
+    _lokasi.dispose();
+    _kategori.dispose();
+    _alamat.dispose();
+    _tanggal.dispose();
+    _jam.dispose();
+    super.dispose();
+  }
+
+  // untuk gambar bisa muncul
   Future<void> _pickImage(ImageSource source) async {
     final ImagePicker _picker = ImagePicker();
     final XFile? image = await _picker.pickImage(source: source);
@@ -38,12 +55,42 @@ class _UploadScreenState extends State<UploadScreen> {
     });
   }
 
+  // untuk upload postingan
+  Future<void> _uploadPostingan() async {
+    if (kategoriController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Pilih kategori terlebih dahulu')));
+      FocusScope.of(context).requestFocus(_kategori);
+      return;
+    } else if (deskripsiController.text.isEmpty) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Masukkan deskripsi')));
+      FocusScope.of(context).requestFocus(_deskripsi);
+      return;
+    } else if (alamatController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Pilih alamat terlebih dahulu')));
+      FocusScope.of(context).requestFocus(_alamat);
+      return;
+    } else if (lokasiController.text.isEmpty) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Masukkan lokasi terkhir')));
+      FocusScope.of(context).requestFocus(_lokasi);
+      return;
+    } else if (tanggalController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Masukkan Tanggal terlebih dahulu')));
+      return;
+    } else if (waktuController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Masukkan jam terlebih dahulu')));
+      return;
+    }
 
-   Future<void> _uploadPostingan() async {
-    var request = http.MultipartRequest('POST', ApiService.url('coba.php'));
-    request.fields['id_user'] = widget.userId.toString(); // Menggunakan userId dari widget
+    var request =
+        http.MultipartRequest('POST', ApiService.url('upload_postingan.php'));
+    request.fields['id_user'] = widget.userId.toString();
     request.fields['kategori'] = kategoriController.text;
-    request.fields['judul_postingan'] = judulController.text;
     request.fields['deskripsi'] = deskripsiController.text;
     request.fields['alamat'] = alamatController.text;
     request.fields['lokasi'] = lokasiController.text;
@@ -51,18 +98,24 @@ class _UploadScreenState extends State<UploadScreen> {
     request.fields['jam_postingan'] = waktuController.text;
 
     if (_imageFile != null) {
-      request.files.add(await http.MultipartFile.fromPath('foto_postingan', _imageFile!.path));
+      request.files.add(await http.MultipartFile.fromPath(
+          'foto_postingan', _imageFile!.path));
     }
 
     var response = await request.send();
 
     if (response.statusCode == 200) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Postingan berhasil diunggah')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Postingan berhasil diunggah'),
+        backgroundColor: Colors.green,
+      ));
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal mengunggah postingan')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Gagal mengunggah postingan'),
+        backgroundColor: AppColors.tomato,
+      ));
     }
   }
-
 
   // Metode untuk menampilkan modal bottom sheet
   Future<dynamic> _showSheet(BuildContext context) {
@@ -159,33 +212,10 @@ class _UploadScreenState extends State<UploadScreen> {
                       textInputType: TextInputType.text,
                       textInputAction: TextInputAction.next,
                       dropdownItems: ['Kehilangan', 'Ditemukan'],
+                      focusNode: _kategori,
                     ),
                   ),
                   // end textField Kategori
-
-                  // textField Judul
-                  SizedBox(height: 8.0),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 3),
-                    child: Text(
-                      'Judul',
-                      style: TextStyles.title,
-                    ),
-                  ),
-
-                  SizedBox(height: 8.0),
-                  Container(
-                    constraints: BoxConstraints(
-                      maxWidth: 370.0,
-                    ),
-                    child: CustomTextField2(
-                      controller: judulController,
-                      textInputType: TextInputType.text,
-                      textInputAction: TextInputAction.next,
-                      enableDropdown: false, // Dropdown tidak diaktifkan
-                    ),
-                  ),
-                  // end TextField Judul
 
                   // start textfield deskripsi
                   SizedBox(height: 8.0),
@@ -205,6 +235,7 @@ class _UploadScreenState extends State<UploadScreen> {
                       controller: deskripsiController,
                       textInputType: TextInputType.text,
                       textInputAction: TextInputAction.newline,
+                      focusNode: _deskripsi,
                     ),
                   ),
                   // end textfield deskripsi
@@ -227,6 +258,7 @@ class _UploadScreenState extends State<UploadScreen> {
                       controller: alamatController,
                       textInputType: TextInputType.text,
                       textInputAction: TextInputAction.next,
+                      focusNode: _alamat,
                       dropdownItems: [
                         'Bagor',
                         'Baron',
@@ -272,7 +304,8 @@ class _UploadScreenState extends State<UploadScreen> {
                       controller: lokasiController,
                       textInputType: TextInputType.text,
                       textInputAction: TextInputAction.next,
-                      enableDropdown: false, // Dropdown tidak diaktifkan
+                      enableDropdown: false,
+                      focusNode: _lokasi,
                     ),
                   ),
                   // end lokasi
@@ -312,6 +345,7 @@ class _UploadScreenState extends State<UploadScreen> {
                                   controller: tanggalController,
                                   textInputType: TextInputType.text,
                                   textInputAction: TextInputAction.next,
+                                  focusNode: _tanggal,
                                   enableDropdown:
                                       false, // Dropdown tidak diaktifkan
                                 ),
@@ -349,6 +383,7 @@ class _UploadScreenState extends State<UploadScreen> {
                                   controller: waktuController,
                                   textInputType: TextInputType.text,
                                   textInputAction: TextInputAction.next,
+                                  focusNode: _jam,
                                   enableDropdown:
                                       false, // Dropdown tidak diaktifkan
                                 ),
